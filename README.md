@@ -40,7 +40,7 @@ It is recommended to take some time looking around the file assembly within dnSp
 3. If unfamiliar errors are thrown when you try to save an edit, first save your changes in a Notepad document or similar place, then restart dnSpy and retry.
 4. New mechanics have to be added to the YML Parser in ScenarioRuleLibrary.YML.AbilityData.ParseAbilityProperties() at very specific places, depending on the name of the mechanic. If you know how, you can translate the name to a UINT yourself and find the right place, but GHEM will also show you the UINT in the validation log when you attempt (and fail) to validate a mod that has your new ability in its ability card YMLs.
    - There are many YML parsers, and therefore no guarantee that the relevant parser has this UINT-checker implemented for you. If you add a UINT-checker to a parser, keep it in your commit so that others can benefit.
-5. Gloomhaven keeps logs at C:\Users\*username*\AppData\LocalLow\FlamingFowlStudios\Gloomhaven, which can come in handy for debugging. "Player.log" is long and detailed, while "Simple.log" is, obviously, simpler. Write to "Simple.log" by pasting in the following header and code snippet:
+5. Gloomhaven keeps logs at C:\Users\YourUsername\AppData\LocalLow\FlamingFowlStudios\Gloomhaven, which can come in handy for debugging. "Player.log" is long and detailed, while "Simple.log" is, obviously, simpler. Write to "Simple.log" by pasting in the following header and code snippet:
 ```
 using SharedLibrary.SimpleLog;
 ...
