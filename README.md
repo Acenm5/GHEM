@@ -33,61 +33,67 @@ It is recommended to take some time looking around the file assembly within dnSp
 4. New mechanics have to be added to the YML Parser in ScenarioRuleLibrary.YML.AbilityData.ParseAbilityProperties() at very specific places, depending on the name of the mechanic. If you know how, you can translate the name to a uint yourself and find the right place, but GHEM will also show you the UINT in the validation log when you attempt (and fail) to validate a mod that has your new ability in its ability card YMLs.
    - There are many YML parsers, and therefore no guarantee that the relevant parser has this UINT-checker implemented for you. If you add a UINT-checker to a parser, keep it in your commit so that others can benefit.
 5. Gloomhaven keeps logs at C:\Users\*username*\AppData\LocalLow\FlamingFowlStudios\Gloomhaven, which can come in handy for debugging. "Player.log" is long and detailed, while "Simple.log" is, obviously, simpler. Write to "Simple.log" by pasting in the following header and code snippet:
-`using SharedLibrary.SimpleLog;`
-`...`
-`SimpleLog.AddToSimpleLog("This would be added to the log.", true);`
+```
+using SharedLibrary.SimpleLog;
+...
+SimpleLog.AddToSimpleLog("This would be added to the log.", true);
+```
 
 #### Predicates (Func)
 **Predicates are not handled well by dnSpy. They look something like this when decompiled:**
-
-`Func<MonsterYMLData, bool> <>9__17;
+```
+Func<MonsterYMLData, bool> <>9__17;
 for (i = 0; i < 4; i = i4 + 1)
 {
     IEnumerable<MonsterYMLData> monsters2 = ScenarioRuleClient.SRLYML.Monsters;
     Func<MonsterYMLData, bool> func5;
-	  if ((func5 = <>9__17) == null)
-	  {
-	      func5 = (<>9__17 = (MonsterYMLData s) => s.ID == summonNamesList[i]);
-	  }
-	  Func<MonsterYMLData, bool> func6 = func5;
-	  if (monsters2.SingleOrDefault(func6) != null)
-	  {
-	      array2[i] = true;
-	  }
-	  i4 = i;
-}`
+    if ((func5 = <>9__17) == null)
+    {
+    	func5 = (<>9__17 = (MonsterYMLData s) => s.ID == summonNamesList[i]);
+    }
+    Func<MonsterYMLData, bool> func6 = func5;
+    if (monsters2.SingleOrDefault(func6) != null)
+    {
+    	array2[i] = true;
+    }
+    i4 = i;
+}
+```
 
 **You need to clean this up before you can save your edits. A clean version of the code above is below:**
-
-`Func<MonsterYMLData, bool> predicate;`
-`for (i = 0; i < 4; i = i4 + 1)`
-`{`
-    `IEnumerable<MonsterYMLData> monsters2 = ScenarioRuleClient.SRLYML.Monsters;`
-    `Func<MonsterYMLData, bool> func5;`
-    `func5 = (predicate = (MonsterYMLData s) => s.ID == summonNamesList[i]);`
-    `Func<MonsterYMLData, bool> func6 = func5;`
-    `if (monsters2.SingleOrDefault(func6) != null)`
-    `{`
-	  `array2[i] = true;`
-     `}`
-     `i4 = i;`
-`}`
+```
+Func<MonsterYMLData, bool> predicate;
+for (i = 0; i < 4; i = i4 + 1)
+{
+    IEnumerable<MonsterYMLData> monsters2 = ScenarioRuleClient.SRLYML.Monsters;
+    Func<MonsterYMLData, bool> func5;
+    func5 = (predicate = (MonsterYMLData s) => s.ID == summonNamesList[i]);
+    Func<MonsterYMLData, bool> func6 = func5;
+    if (monsters2.SingleOrDefault(func6) != null)
+    {
+        array2[i] = true;
+    }
+    i4 = i;
+}
+```
 
 #### PrivateImplementationDetails 
 **Any class with PrivateImplementationDetails cannot be saved without the following code snippet added to it:**
-`internal sealed class PrivateImplementationDetails`
-`{`
-    `internal static uint ComputeStringHash(string s)`
-    `{`
-        `uint num = new uint();`
-        `if (s != null)`
-        `{`
-            `num = 0x811c9dc5;`
-            `for (int i = 0; i < s.Length; i++)`
-            `}`
-                `num = (s[i] ^ num) * 0x1000193;`
-            `}`
-        `}`
-        `return num;`
-    `}`
-`}`
+```
+internal sealed class PrivateImplementationDetails
+{
+    internal static uint ComputeStringHash(string s)
+    {
+        uint num = new uint();
+        if (s != null)
+        {
+            num = 0x811c9dc5;
+            for (int i = 0; i < s.Length; i++)
+            }
+                num = (s[i] ^ num) * 0x1000193;
+            }
+        }
+        return num;
+    }
+}
+```
