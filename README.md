@@ -24,6 +24,10 @@ GHEM is meant to have little to no impact on the base video game, meaning that c
 ## MULTIPLAYER WITH GHEM
 As stated above, GHEM is not meant to impact the base video game. If you have GHEM installed but other players do not, you will still be able to play unmodded multiplayer without issue. MODDED MULTIPLAYER HAS NOT BEEN TESTED, but it is theoretically possible as long as each player has GHEM installed locally. If you attempt modded multiplayer, keep in mind that even without GHEM it can and will take a few minutes to load in as a non-host.
 
+## MODDING WITH GHEM
+It is recommended to browse the Runeriot's ability cards to see the correct usage of current GHEM mechanics.
+- [ ] Create documentation akin to the official documentation at https://www.flamingfowlstudios.com/GloomhavenModding/docs-page.html
+
 ## CONTRIBUTING TO GHEM
 GHEM was created using dnSpy 6.3.0 (https://github.com/dnSpy/dnSpy.git). Visit the tool's repository for instructions on getting started with it.
 
