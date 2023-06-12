@@ -1,0 +1,51 @@
+Parser: AbilityCard
+Name: $ABILITY_CARD_InspirationalPresence$
+Character: RuneriotID
+ID: 1996017
+Level: 2
+Initiative: 28
+Discard: [Discard,Lost]
+Data:
+    Top:
+        Abilities:
+            TStrengthenAllies:
+                AnimOverload: RadialBuff
+                Strengthen: True
+                Range: 2
+                Target: -1
+                Filter: Ally
+            TStrengthenSelf:
+                Strengthen: True
+                Filter: Self
+    Bottom:
+        Abilities:
+            BSummon:
+                Summon: SavvasAggravatorID
+                AnimOverload: Summon
+        XP: 2
+Layout:
+    Top:
+        - Row: "<b><size=130%>$Strengthen$ <sprite name=Strengthen>"
+        - Row: "$Affect_AllAlliesWithin$ $Range$ <sprite name=Range> *TStrengthenAllies.Range*"
+        - Row: "<size=50%> "
+        - Row: "<b><size=130%>$Strengthen$ <sprite name=Strengthen>"
+        - Row: "$Self$"
+    Bottom:
+        - Active:
+            Ability: "BSummon"
+            Icon: "Summon"
+            Layout:
+                - Summon:
+                    Ability: BSummon
+                    SummonName: $SavvasAggravator$
+                    SpecialText:
+                        - Row: "$Provoke$"
+                        - Duration: Round
+        - Row: "<size=20%> "
+        - Row:
+            - ColumnWidths: "30,20,20"
+            - Column:
+            - Column:
+                - XP: 2
+            - Column:
+                - Duration: Persistent

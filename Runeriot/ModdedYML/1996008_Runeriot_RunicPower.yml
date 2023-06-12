@@ -1,0 +1,60 @@
+Parser: AbilityCard
+Name: $ABILITY_CARD_RunicPower$
+Character: RuneriotID
+ID: 1996008
+Level: 1
+Initiative: 69
+Discard: [Lost,Discard]
+Data:
+    Top:
+        Abilities:
+            TAttack:
+                Attack:
+                    Amount: 0
+                StatIsBasedOnX:
+                    Strength:
+                        BasedOn: HexesInAreaWithNegativeProps #GHEM - counts DT, HT, obstacles, and traps - only works on attacks
+                Range:
+                    Amount: 2
+                AreaEffect: "0,0,R|2,0,R|1,1,R|-1,1,R|-2,0,R|-1,-1,R|1,-1,R"
+                MultiPassAttack: False
+                AnimOverload: TargetedDirtTornado        
+        Infuse: Any
+        XP: 1
+    Bottom:
+        Abilities:
+            BActive:
+                Trap:
+                    Damage: 2
+                Filter: Self
+                ActiveBonus:
+                    Duration: Round
+                    Behaviour: BuffTrap #GHEM - buffs next trap abilities with any normal TrapData besides TrapName and TriggeredTrapAbility
+                    XPTracker: [0]
+                AnimOverload: PowerUp
+Layout:
+    Top:
+        - Row:
+            - ColumnWidths: "60,35"
+            - Column:
+                - Row: "<b><size=130%>$Attack$ <sprite name=Attack> X"
+                - Row: "$Range$ <sprite name=Range> *TAttack.Range*\n<size=20%> "
+                - Row:
+                    - ColumnWidths: "24,25,25"
+                    - Column:
+                    - Column:
+                        - Infuse: Any
+                    - Column:
+                        - XP: 1
+            - Column:
+                - Row: "£Area£"
+        - Row: "$1996008_T$"
+    Bottom:
+        - Active:
+            Ability: BActive
+            ListLayout: "$1996008_B$"
+            Layout: "$1996008_B$"
+            Icon: "AA_Cragheart"
+            HideTracker: True
+        - Row: "<size=50%> "
+        - Duration: Round

@@ -1,0 +1,58 @@
+Parser: AbilityCard
+Name: $ABILITY_CARD_EnergyShift$
+Character: RuneriotID
+ID: 1996016
+Level: 2
+Initiative: 36
+Discard: [Discard,Lost]
+Data:
+    Top:
+        Abilities:
+            TAttack:
+                Attack:
+                    Amount: 2
+                    Enhancements: 1
+            THeal:
+                Heal:
+                    Amount: 2
+                    Enhancements: 1
+                Filter: Self
+                AnimOverload: Heal
+    Bottom:
+        Abilities:
+            BAttack:
+                Attack:
+                    Amount: 1
+                    Enhancements: 1
+                Range: 2
+                AreaEffect: "0,0,R|2,0,R|1,1,R|-1,1,E"
+                MultiPassAttack: False
+                AnimOverload: TargetedForcefulStorm
+                SubAbilities:
+                    BDisarm:
+                        IsInlineSubAbility: True
+                        Disarm: True
+                        Filter:
+                            TargetType: Enemy
+                            TargetHasNegativeCondition: Muddle
+                        SkipAnim: True
+                    BMuddle:
+                        IsInlineSubAbility: True
+                        Muddle: True
+                        Filter: Enemy
+                        SkipAnim: True
+Layout:
+    Top:
+        - Row: "<b><size=130%>$Attack$ <sprite name=Attack> *TAttack* <size=100%><voffset=1>@TAttack@"
+        - Row: "<size=50%> "
+        - Row: "<b><size=130%>$Heal$ <sprite name=Heal> *THeal* <size=100%><voffset=1>@THeal@"
+        - Row: "$Self$"
+    Bottom:
+        - Row:
+            - ColumnWidths: "70,25"
+            - Column:
+                - Row: "<b><size=130%>$Attack$ <sprite name=Attack> *BAttack* <size=100%><voffset=1>@BAttack@"
+                - Row: "$Range$ <sprite name=Range> *BAttack.Range*"
+            - Column:
+                - Row: "£Area£"
+        - Row: "<size=50%> \n<size=100%>$1996016_B$\n<size=50%> "

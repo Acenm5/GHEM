@@ -1,0 +1,42 @@
+Parser: AbilityCard
+Name: $ABILITY_CARD_TieDown$
+Character: RuneriotID
+ID: 1996014
+Level: X
+Initiative: 57
+Discard: [Discard,Lost]
+Data:
+    Top:
+        Abilities:
+            TAttack:
+                Attack: 
+                    Amount: 2
+                Range:
+                    Amount: 2
+                    Enhancements: 1
+                Conditions: [StopFlying]
+                SubAbilities:
+                    TAttackSubPull:
+                        Pull: 1
+    Bottom:
+        Abilities:
+            BHeal:
+                Heal:
+                    Amount: 6
+                    Enhancements: 1
+                Range:
+                    Amount: 2
+                    Enhancements: 1
+                Condition: Immobilize
+                Filter: [Ally, Self]
+                AnimOverload: Heal
+Layout:
+    Top:
+        - Row: "<b><size=130%>$Attack$ <sprite name=Attack> *TAttack* <size=100%><voffset=1>@TAttack@"
+        - Row: "$Range$ <sprite name=Range> *TAttack.Range* <size=100%><voffset=1>@TAttack.Range@"
+        - Row: "$Pull$ <sprite name=Pull> *TAttackSubPull*"
+        - Row: "$Target_CanNoLongerFly$"
+    Bottom:
+        - Row: "<b><size=130%>$Heal$ <sprite name=Heal> *BHeal* <size=100%><voffset=1>@BHeal@"
+        - Row: "$Range$ <sprite name=Range> *BHeal.Range* <size=100%><voffset=1>@BHeal.Range@"
+        - Row: "$Immobilize$ <sprite name=Immobilize>"

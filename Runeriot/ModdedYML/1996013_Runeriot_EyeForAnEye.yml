@@ -1,0 +1,48 @@
+Parser: AbilityCard
+Name: $ABILITY_CARD_EyeForAnEye$
+Character: RuneriotID
+ID: 1996013
+Level: X
+Initiative: 41
+Discard: [Lost,Discard]
+Data:
+    Top:
+        Abilities:
+            TRetaliate:
+                Retaliate:
+                    Amount: 1
+                    Enhancements: 1
+                Filter: Self
+                ActiveBonusDuration: Persistent
+        XP: 2
+    Bottom:
+        Abilities:
+            BMove:
+                Move:
+                    Amount: 3
+                    Enhancements: 1
+            BMuddle:
+                Muddle: True
+                Filter: Enemy
+Layout:
+    Top:
+        - Active:
+            Ability: TRetaliate
+            Icon: "Retaliate"
+            ListLayout: "$Retaliate$ <sprite name=Retaliate> *TRetaliate*, $Self$."
+            Layout:
+                - Row: "<b><size=130%>$Retaliate$ <sprite name=Retaliate> *TRetaliate* <size=100%><voffset=1>@TRetaliate@"
+                - Row: "$Self$"
+        - Row: "<size=50%> "
+        - Row:
+            - ColumnWidths: "30,20,20"
+            - Column:
+            - Column:
+                - XP: 2
+            - Column:
+                - Duration: Persistent
+    Bottom:
+        - Row: "<b><size=130%>$Move$ <sprite name=Move> *BMove* <size=100%><voffset=1>@BMove@"
+        - Row: "<size=50%> "
+        - Row: "<b><size=130%>$Muddle$ <sprite name=Muddle>"
+        - Row: "$Target_OneAdjacentEnemy$"

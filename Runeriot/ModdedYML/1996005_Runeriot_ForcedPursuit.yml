@@ -1,0 +1,79 @@
+Parser: AbilityCard
+Name: $ABILITY_CARD_ForcedPursuit$
+Character: RuneriotID
+ID: 1996005
+Level: 1
+Initiative: 16
+Discard: [Lost,Discard]
+Data:
+    Top:
+        Abilities:
+            TAttack:
+                Attack: 3
+                Range:
+                    Amount: 3
+                    Enhancements: 1
+                Target:
+                    Amount: 2
+                    Enhancements: 1
+                MultiPassAttack: False
+                AnimOverload: RangedAttack
+                XPPerTarget: 1
+                SubAbilities:
+                    TAttackSubProvoke:
+                        AddActiveBonus:
+                            Null: True
+                        ActiveBonus:
+                            Duration: Persistent
+                            Behaviour: Provoke #GHEM, makes the target focus on the caster and not avoid negative hexes while moving
+                        PreviewEffectText: Provoke_EffectText
+                        AnimOverload: GivePackAdjacent
+    Bottom:
+        Abilities:
+            BTarget:
+                NullTargeting: True
+                Range: 1
+                Target: 1
+                Filter: Enemy
+                AnimOverload: GivePackAdjacent
+                SubAbilities:
+                    BProvoke:
+                        AddActiveBonus:
+                            Null: True
+                        ActiveBonus:
+                            Duration: Persistent
+                            Behaviour: Provoke #GHEM, makes the target focus on the caster and not avoid negative hexes while moving
+                        PreviewEffectText: Provoke_EffectText
+                        AnimOverload: GivePackAdjacent
+            BMove:
+                Move:
+                    Amount: 2
+                    Enhancements: 1
+                    Jump: True
+Layout:
+    Top:
+        - Row: "<b><size=130%>$Attack$ <sprite name=Attack> *TAttack*"
+        - Row: "$Range$ <sprite name=Range> *TAttack.Range* @TAttack.Range@"
+        - Row: "$Target$ <sprite name=Target> *TAttack.Target* @TAttack.Target@"
+        - Row: "$Provoke$"
+        - Row: "<size=20%> "
+        - Row: "$XP_PerEnemy$"
+        - Active:
+            Ability: TAttackSubProvoke
+            ListLayout: "$Provoke_ActiveText$"
+            Layout: "<size=20%> "
+            Icon: "AA_Cragheart"
+        - Duration: Persistent
+    Bottom:
+        - Row: "<b><size=130%>$Provoke$"
+        - Row: "$Target_OneAdjacentEnemy$"
+        - Active:
+            Ability: BProvoke
+            ListLayout: "$Provoke_ActiveText$"
+            Layout: "<size=20%> "
+            Icon: "AA_Cragheart"
+        - Row: "<size=50%> "
+        - Row: "<b><size=130%>$Move$ <sprite name=Move> *BMove* <size=100%><voffset=1>@BMove@"
+        - Row: "$Jump$ <sprite name=Jump>"
+        - Row: "<size=20%> "
+        - Duration: Persistent

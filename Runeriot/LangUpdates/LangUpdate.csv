@@ -1,0 +1,62 @@
+Key,English [en-GB]
+Runeriot,Runeriot
+Runeriot_ROLE,Crowd Control
+Runeriot_DESCRIPTION,"Disillusionment and dissatisfaction with its society can lead a Savvas to break its own core and journey to the world's frontiers, bringing along the elemental education it received before striking out on its own. Once it chooses where to make a place for itself, it puts all of its efforts into scuplting a community where it is respected and empowered, often clashing with whatever systems have already been established there. As natural leaders, these Runeriots will garner support to put pressure on societies that they see as imperfect and able to be changed, unlike the one they chose to leave behind. And if those societies try to use force to quiet a Runeriot, it will be ready to defend what it believes."
+Runeriot_STRENGTHS,"- <indent=%15>Unique Runes have greater effects if triggered quickly</indent>
+- <indent=%15>Can Provoke enemies into ignoring allies and springing traps</indent>
+- <indent=%15>Large hand size allows plenty of options and tanking in a pinch</indent>"
+Runeriot_WEAKNESSES,"- <indent=%15>Low damage dealing capacity outside of traps</indent>
+- <indent=%15>Can struggle against enemies that use ranged attacks</indent>
+- <indent=%15>Plans very traumatizing surprise parties</indent>"
+Runeriot_ADVENTURE_DESCRIPTION,"Disillusionment and dissatisfaction with its society can lead a Savvas to break its own core and journey to the world's frontiers, bringing along the elemental education it received before striking out on its own. Once it chooses where to make a place for itself, it puts all of its efforts into scuplting a community where it is respected and empowered, often clashing with whatever systems have already been established there. As natural leaders, these Runeriots will garner support to put pressure on societies that they see as imperfect and able to be changed, unlike the one they chose to leave behind. And if those societies try to use force to quiet a Runeriot, it will be ready to defend what it believes."
+Rune,<color=#E3CC99>Rune</color>
+Rune_OnEnemySpring,On enemy spring: 
+Rune_DiscardReminder,"After the trap is sprung,<br>discard this card."
+Provoke,PROVOKE
+Provoke_ActiveText,The provoked enemy will focus on this mercenary and not avoid negative hexes while moving. Removed when the provoked enemy attacks this mercenary.
+Provoke_EffectText,This enemy will focus on the provoking mercenary and not avoid negative hexes while moving. Removed when this enemy attacks the provoking mercenary.
+ABILITY_CARD_NothingSpecial,Nothing Special
+ABILITY_CARD_RunAmok,Run Amok
+1996095_B,"Your Move actions gain Jump <sprite name=Jump>. At the end of each of your turns, you may perform a ""Move <sprite name=Move> X"" action, where X is the number of hexes you have moved so far this turn."
+ABILITY_CARD_IntoTheFray,Into The Fray
+1996096_T,"Add ""PIERCE <sprite name=Pierce> X"" to all of your attacks, where X is the number of hexes you have moved so far this turn."
+ABILITY_CARD_ShakeTheFoundation,Shake The Foundation
+1996098_T_1,<sprite name=Range>: target grey hex
+1996098_T_2,<sprite name=Attack>: +1 Attack <sprite name=Attack>
+ABILITY_CARD_TectonicPlate,Tectonic Plate
+1996001_T_1,Create one 2 damage POISON <sprite name=Poison> trap in an empty hex within Range <sprite name=Range> *TTrap.Range*.
+1996001_T_2,"<size=150%><sprite name=ConsumeEarth></size><voffset=0><size=100%>: PUSH <sprite name=Push> 1,  create an obstacle in this hex if possible, <sprite name=XP1></size>"
+ABILITY_CARD_Tripfire,Tripfire
+1996002_T_1,Create one 2 damage WOUND <sprite name=Wound> trap in an empty hex within Range <sprite name=Range> *TTrap.Range*.
+1996002_T_2,"<size=150%><sprite name=ConsumeFire></size><voffset=0><size=100%>: create hazardous terrain in this hex if possible, <sprite name=XP1></size>"
+ABILITY_CARD_MeltingPit,Melting Pit
+1996003_T_1,Create one 2 damage IMMOBILIZE <sprite name=Immobilize> trap in an empty hex within Range <sprite name=Range> *TTrap.Range*.
+1996003_T_2,"<size=150%><sprite name=ConsumeIce></size><voffset=0><size=100%>: STUN <sprite name=Stun>, create difficult terrain in this hex if possible, <sprite name=XP1></size>"
+ABILITY_CARD_SonicBomb,Sonic Bomb
+1996004_T_1,Create one 2 damage DISARM <sprite name=Disarm> trap in an empty hex within Range <sprite name=Range> *TTrap.Range*.
+1996004_T_2,"<size=150%><sprite name=ConsumeAir></size><voffset=0><size=100%>: MUDDLE <sprite name=Muddle> all enemies in and adjacent to this hex, <sprite name=XP1></size>"
+1996004_B,"One ally within <nobr>Range <sprite name=Range> 2</nobr> may perform a <nobr>""Move <sprite name=Move> 2""</nobr> action, <voffset=1><sprite name=XP1>"
+ABILITY_CARD_ForcedPursuit,Forced Pursuit
+ABILITY_CARD_Ambush,Ambush
+1996006_B,"The next four times an enemy springs a trap within <nobr>Range <sprite name=Range> 4</nobr>, perform an ""<nobr>Attack <sprite name=Attack> 1</nobr>, <nobr>Range <sprite name=Range> 4</nobr>"" action targeting that enemy."
+ABILITY_CARD_OpenArms,Open Arms
+1996007_T,"The next time an enemy ends a Move ability in a hex adjacent to you this round, gain <sprite name=XP1> and perform an ""Attack <sprite name=Attack> *TActive*, STUN <sprite name=Stun>"" action targeting that enemy."
+ABILITY_CARD_RunicPower,Runic Power
+1996008_T,"where X is the number of hexes in the targeted area containing difficult terrain, hazardous terrain, obstacles, or traps."
+1996008_B,Add +2 damage to the next trap you create this round.
+ABILITY_CARD_EnergyShift,Energy Shift
+1996016_B,"<nobr>MUDDLE <sprite name=Muddle></nobr> all enemies in the targeted area. For each of these enemies that already has <nobr>MUDDLE <sprite name=Muddle></nobr>, <nobr>DISARM <sprite name=Disarm> that enemy instead."
+ABILITY_CARD_RowdyCharge,Rowdy Charge
+1996010_T,Add <nobr>+3 Attack <sprite name=Attack></nobr> and gain <sprite name=XP1> if the target has PROVOKE.
+ABILITY_CARD_BoldAdvance,Bold Advance
+ABILITY_CARD_CollectiveTransference,Collective Transference
+1996012_B,Relocate one trap within<br><nobr>Range <sprite name=Range> *BMoveTrap.Range*</nobr> to another empty<br>hex within <nobr>Range <sprite name=Range> 3</nobr>.
+ABILITY_CARD_EyeForAnEye,Eye for an Eye
+ABILITY_CARD_ChangingTactics,Changing Tactics
+1996400_B,"The next five times you would perform a trap ability, you can forgo the ability to instead perform an <nobr>""Attack <sprite name=Attack></nobr> 3, <nobr>Range <sprite name=Range></nobr> 3, <nobr>PIERCE <sprite name=Pierce> 1”</nobr> ability."
+ABILITY_CARD_TieDown,Tie Down
+ABILITY_CARD_LeadTheWay,Lead the Way
+ABILITY_CARD_CobbleTogether,Cobble Together
+SavvasFollower,Savvas Follower
+ABILITY_CARD_InspirationalPresence,Inspirational Presence
+SavvasAggravator,Savvas Aggravator

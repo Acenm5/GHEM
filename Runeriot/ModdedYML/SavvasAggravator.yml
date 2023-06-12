@@ -1,0 +1,26 @@
+Parser: HeroSummon
+ID: SavvasAggravatorID
+LocKey: $SavvasAggravator$
+Model: Savvas Lavaflow
+Colour: E3CC99
+Vertex: 0.05
+Health:
+    Amount: 5
+    Enhancements: 1
+Move:
+    Amount: 2
+    Enhancements: 1
+Attack: 2
+Range:
+    Amount: 2
+    Enhancements: 1
+AttackOverride:
+    ParentName: DefaultAttack
+    SubAbilities:
+        AttackOverrideSubProvoke:
+            AddActiveBonus:
+                Null: True
+            ActiveBonus:
+                Duration: Round
+                Behaviour: Provoke #GHEM, makes the target focus on the caster and not avoid negative hexes while moving
+            PreviewEffectText: Provoke_EffectText

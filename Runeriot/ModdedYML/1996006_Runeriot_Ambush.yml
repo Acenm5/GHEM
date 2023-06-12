@@ -1,0 +1,66 @@
+Parser: AbilityCard
+Name: $ABILITY_CARD_Ambush$
+Character: RuneriotID
+ID: 1996006
+Level: 1
+Initiative: 70
+Discard: [Discard,Lost]
+Data:
+    Top:
+        Abilities:
+            TAttack:
+                Attack:
+                    Amount: 3
+                    Enhancements: 2
+                SubAbilities:
+                    TAttackSubProvoke:
+                        AddActiveBonus:
+                            Null: True
+                        ActiveBonus:
+                            Duration: Persistent
+                            Behaviour: Provoke #GHEM, makes the target focus on the caster and not avoid negative hexes while moving
+                        PreviewEffectText: Provoke_EffectText
+                        AnimOverload: GivePackAdjacent
+                    TAttackSubPush:
+                        Push: 1
+                        IsInlineSubAbility: True
+    Bottom:
+        Abilities:
+            BActive:
+                AddActiveBonus:
+                    Attack: 1
+                    Range: 4
+                    Filter: Enemy
+                    IsInlineSubAbility: True
+                    AnimOverload: RangedAttack
+                ActiveBonus:
+                    Duration: Persistent
+                    Behaviour: DuringActionAbilityOnTrapTrigger
+                    XPTracker: [0,1,0,1]
+                    IsAura: True
+                    AuraTargeting: Range
+                    AuraFilter: Enemy
+                    TriggerOnCaster: True
+                Range: 4
+                Target: -1
+                Filter: Self
+                AnimOverload: PowerUp
+Layout:
+    Top:
+        - Row: "<b><size=130%>$Attack$ <sprite name=Attack> *TAttack* <size=100%><voffset=1>@TAttack@"
+        - Row: "$Push$ <sprite name=Push> *TAttackSubPush*"
+        - Row: "$Provoke$"
+        - Active:
+            Ability: TAttackSubProvoke
+            ListLayout: "$Provoke_ActiveText$"
+            Layout: "<size=20%> "
+            Icon: "AA_Cragheart"
+        - Duration: Persistent
+    Bottom:
+        - Active:
+            Ability: BActive
+            ListLayout: "$1996006_B$"
+            Layout: "$1996006_B$"
+            Icon: "Attack"
+        - Row: "<size=20%> "
+        - XPTracker: BActive

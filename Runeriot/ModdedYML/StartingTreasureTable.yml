@@ -1,0 +1,63 @@
+Parser: TreasureTable
+StartingTreasureTable:
+
+  UnlockProsperityItemStocks: [IronHelmetID, IronHelmetID, BootsOfStridingID, BootsOfStridingID, WingedShoesID, WingedShoesID, HideArmorID, HideArmorID, LeatherArmorID, LeatherArmorID, CloakOfInvisibilityID, CloakOfInvisibilityID, EagleEyeGogglesID, EagleEyeGogglesID, HeaterShieldID, HeaterShieldID, PiercingBowID, PiercingBowID, WarHammerID, WarHammerID, PoisonDaggerID, PoisonDaggerID, MinorHealingPotionID, MinorHealingPotionID, MinorHealingPotionID, MinorHealingPotionID, MinorStaminaPotionID, MinorStaminaPotionID, MinorStaminaPotionID, MinorStaminaPotionID, MinorPowerPotionID, MinorPowerPotionID, MinorPowerPotionID, MinorPowerPotionID ]
+
+#  Enhancements: [PlusAttack, PlusMove, PlusRange, PlusShield, PlusPush, PlusPull, PlusPierce, PlusRetaliate, PlusHeal, PlusTarget, PlusRetaliateRange, SummonMove, SummonAttack, SummonRange, SummonHP, Area] 
+  
+  UnlockChapter: [1,0]
+  UnlockCharacter: BruteID
+  UnlockCharacter: ScoundrelID  
+  UnlockCharacter: SpellweaverID  
+  UnlockCharacter: TinkererID  
+  UnlockCharacter: CragheartID
+  UnlockCharacter: MindthiefID
+  UnlockCharacter: RuneriotID
+  UnlockMerchant: True  
+  UnlockPartyUI: True  
+  UnlockTemple: True  
+  UnlockMultiplayer: True
+  # Prosperity: 250
+  
+RetirementTreasureTable:
+    Group:
+        Nothing: 100
+    
+CharacterUnlockAlternateTreasureTable:
+    Group:
+        ItemStocks: [BootsOfLevitationID, BootsOfLevitationID]
+        ItemStocks: [ShoesOfHappinessID, ShoesOfHappinessID]
+        ItemStocks: [BlinkingCapeID, BlinkingCapeID]
+        ItemStocks: [SwordedgeArmorID, SwordedgeArmorID] 
+        ItemStocks: [CircletOfElementsID, CircletOfElementsID]
+        ItemStocks: [ChainHoodID, ChainHoodID]
+        ItemStocks: [FrigidBladeID, FrigidBladeID]
+        ItemStocks: [StormBladeID, StormBladeID]
+        ItemStocks: [InfernoBladeID, InfernoBladeID]
+        ItemStocks: [TremorBladeID, TremorBladeID]
+        ItemStocks: [BrilliantBladeID, BrilliantBladeID]
+        ItemStocks: [NightBladeID, NightBladeID]
+        ItemStocks: [WandOfFrostID, WandOfFrostID]
+        ItemStocks: [WandOfStormsID, WandOfStormsID]
+        ItemStocks: [WandOfInfernosID, WandOfInfernosID]
+        ItemStocks: [WandOfTremorsID, WandOfTremorsID]
+        ItemStocks: [WandOfBrillianceID, WandOfBrillianceID]
+        ItemStocks: [WandOfDarknessID, WandOfDarknessID]
+        ItemStocks: [MinorCurePotionID, MinorCurePotionID]
+        ItemStocks: [MajorCurePotionID, MajorCurePotionID]
+        ItemStocks: [SteelRingID, SteelRingID]
+        ItemStocks: [DampeningRingID, DampeningRingID]
+        ItemStocks: [ScrollOfPowerID, ScrollOfPowerID]
+        ItemStocks: [ScrollOfHealingID, ScrollOfHealingID]
+        ItemStocks: [ScrollOfStaminaID, ScrollOfStaminaID]
+    Group:
+        UnlockQuest: Quest_Campaign_063
+        UnlockQuest: Quest_Campaign_064
+        UnlockQuest: Quest_Campaign_065
+        UnlockQuest: Quest_Campaign_066
+        UnlockQuest: Quest_Campaign_067
+        UnlockQuest: Quest_Campaign_068
+        UnlockQuest: Quest_Campaign_069
+        UnlockQuest: Quest_Campaign_070
+        UnlockQuest: Quest_Campaign_071
+    Prosperity: 1

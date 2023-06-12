@@ -1,0 +1,42 @@
+Parser: AbilityCard
+Name: $ABILITY_CARD_RowdyCharge$
+Character: RuneriotID
+ID: 1996010
+Level: 1
+Initiative: 27
+Discard: [Lost,Lost]
+Data:
+    Top:
+        Abilities:
+            TAttack:
+                Attack:
+                    Amount: 3
+                    Enhancements: 1
+                ConditionalOverrides:
+                    TAttackCO:
+                        Filter:
+                            TargetProvokeCount: "> 0" #GHEM
+                        XP: 1
+                        AbilityOverrides:
+                            TProvokeBuff:
+                                Strength: 3
+    Bottom:
+        Abilities:
+            BMove:
+                Move:
+                    Amount: 5
+                    Enhancements: 1
+                Conditions: Strengthen
+                AllTargetsOnMovePath: True
+        XP: 1
+Layout:
+    Top:
+        - Row: "<b><size=130%>$Attack$ <sprite name=Attack> *TAttack* <size=100%><voffset=1>@TAttack@"
+        - Row: "$1996010_T$"
+    Bottom:
+        - Row: "<b><size=130%>$Move$ <sprite name=Move> *BMove* <size=100%><voffset=1>@BMove@"
+        - Row: "<size=50%> "
+        - Row: "<b><size=130%>$Strengthen$ <sprite name=Strengthen>"
+        - Row: "$Affect_AllAlliesMovedThrough$"
+        - Row: "<size=20%> "
+        - XP: 1

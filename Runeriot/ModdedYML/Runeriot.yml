@@ -1,0 +1,18 @@
+Parser: Character
+ID: RuneriotID
+LocKey: $Runeriot$
+Model: Cragheart
+DefaultSkin: 2
+Colour: E3CC99
+# C8A2C8
+# Vertex: -0.5
+# ChunkModifier: 0.0
+# PlayerLevel:  [  1,   2,   3,   4,   5,   6,   7,   8,   9 ]
+HealthTable:    [  8,   9,  11,  12,  14,  15,  17,  18,  20 ]
+NumberAbilityCardsInBattle: 12
+Role: $Runeriot_ROLE$
+Description: $Runeriot_DESCRIPTION$
+Difficulty: $DIFFICULTY_MEDIUM$
+Strengths: $Runeriot_STRENGTHS$
+Weaknesses: $Runeriot_WEAKNESSES$
+Adventure_Description: $Runeriot_ADVENTURE_DESCRIPTION$

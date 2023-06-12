@@ -1,0 +1,44 @@
+Parser: AbilityCard
+Name: $ABILITY_CARD_CobbleTogether$
+Character: RuneriotID
+ID: 1996009
+Level: 1
+Initiative: 62
+Discard: [Discard,Lost]
+Data:
+    Top:
+        Abilities:
+            THeal:
+                Heal:
+                    Amount: 3
+                    Enhancements: 1
+                Filter: Self
+                AnimOverload: Heal
+    Bottom:
+        Abilities:
+            BSummon:
+                Summon: SavvasFollowerID
+                AnimOverload: Summon
+        XP: 2
+Layout:
+    Top:
+        - Row: "<b><size=130%>$Heal$ <sprite name=Heal> *THeal* <size=100%><voffset=1>@THeal@"
+        - Row: "$Self$"
+    Bottom:
+        - Active:
+            Ability: "BSummon"
+            Icon: "Summon"
+            Layout:
+                - Summon:
+                    Ability: BSummon
+                    SummonName: $SavvasFollower$
+                    SpecialText: 
+                        - Row: "<nobr>$Push$ <sprite name=Push> 1</nobr>"
+        - Row: "<size=20%> "
+        - Row:
+            - ColumnWidths: "30,20,20"
+            - Column:
+            - Column:
+                - XP: 2
+            - Column:
+                - Duration: Persistent

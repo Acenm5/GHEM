@@ -1,0 +1,33 @@
+Parser: AbilityCard
+Name: $ABILITY_CARD_BoldAdvance$
+Character: RuneriotID
+ID: 1996011
+Level: 1
+Initiative: 32
+Discard: [Discard,Discard]
+Data:
+    Top:
+        Abilities:
+            TStrengthenAlly:
+                Strengthen: True
+                Range: 3
+                Filter: Ally
+                AnimOverload: PowerUpOther
+            TStrengthenSelf:
+                Strengthen: True
+                Filter: Self
+    Bottom:
+        Abilities:
+            BMove:
+                Move:
+                    Amount: 4
+                    Enhancements: 1
+Layout:
+    Top:
+        - Row: "<b><size=130%>$Strengthen$ <sprite name=Strengthen>"
+        - Row: "$Affect_OneAllyWithinRange3$"
+        - Row: "<size=50%> "
+        - Row: "<b><size=130%>$Strengthen$ <sprite name=Strengthen>"
+        - Row: "$Self$"
+    Bottom:
+        - Row: "<b><size=130%>$Move$ <sprite name=Move> *BMove* <size=100%><voffset=1>@BMove@"

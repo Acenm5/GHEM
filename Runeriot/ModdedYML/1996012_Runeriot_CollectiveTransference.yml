@@ -1,0 +1,38 @@
+Parser: AbilityCard
+Name: $ABILITY_CARD_CollectiveTransference$
+Character: RuneriotID
+ID: 1996012
+Level: 1
+Initiative: 48
+Discard: [Discard,Discard]
+Data:
+    Top:
+        Abilities:
+            TLoot:
+                Loot: 1
+                Target: -1
+                AnimOverload: Loot
+        Consumes:
+            BCAny:
+                Elements: Any
+                Abilities:
+                    BCAnyInfuse:
+                        Infuse: Any
+    Bottom:
+        Abilities:
+            BMoveTrap:
+                MoveTrap:
+                Target: 1
+                Range: 3
+                MoveTrapRange: 3
+                SkipAnim: True
+Layout:
+    Top:
+        - Row: "<b><size=130%>$Loot$ <sprite name=Loot> *TLoot*"
+        - Row: "<size=50%> "
+        - Consume:
+            Name: BCAny
+            Text:
+                - Infuse: Any
+    Bottom:
+        - Row: "$1996012_B$"

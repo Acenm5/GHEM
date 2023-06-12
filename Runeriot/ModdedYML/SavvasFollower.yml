@@ -1,0 +1,23 @@
+Parser: HeroSummon
+ID: SavvasFollowerID
+LocKey: $SavvasFollower$
+Model: Savvas Icestorm
+Colour: E3CC99
+Vertex: 0.05
+Health:
+    Amount: 3
+    Enhancements: 1
+Move:
+    Amount: 2
+    Enhancements: 1
+Attack:
+    Amount: 1
+    Enhancements: 1
+Range:
+    Amount: 2
+    Enhancements: 1
+AttackOverride:
+    ParentName: DefaultAttack
+    SubAbilities:
+        AttackOverrideSubPush:
+            Push: 1

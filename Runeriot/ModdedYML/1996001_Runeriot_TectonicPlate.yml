@@ -1,0 +1,98 @@
+Parser: AbilityCard
+Name: $ABILITY_CARD_TectonicPlate$
+Character: RuneriotID
+ID: 1996001
+Level: 1
+Initiative: 79
+Discard: [Discard,Discard]
+Data:
+    Top:
+        Abilities:
+            TTrap:
+                Trap:
+                    TrapName: PoisonMine
+                    Damage: 2
+                    Conditions: [Poison]
+                    TriggeredTrapAbility: True #GHEM, the triggered ability must be an active bonus on the same action
+                SpawnDelay: 2.2
+                Target: 1
+                Range: 2
+                SubAbilities:
+                    TActive:
+                        AddActiveBonus:
+                            Filter: Enemy
+                            IsInlineSubAbility: True
+                            MergedPushCreate: #GHEM, both w/ MergedPushCreate being new and merged abilities not being allowed before
+                                Abilities:
+                                    TPush:
+                                        Push: 1
+                                        Filter: Enemy
+                                        Range: 50
+                                        IsInlineSubAbility: True
+                                        IgnoreMergedAbilityTargetSelection: True
+                                    TCreate:
+                                        Create: RockSingle
+                                        SkipAnim: True
+                                        UseMergedWithAbilityTiles: True
+                                        AutoTrigger: True
+                        ActiveBonus:
+                            Duration: Persistent
+                            Behaviour: DuringActionAbilityOnSpecificTrapTrigger #GHEM, the specific trap must be on the same action
+                            IsAura: True
+                            Consuming: Earth
+                            AuraTargeting: All
+                            OriginalTargetType: True
+                            TriggerOnCaster: True
+                            Target: 1
+                            XPTracker: [1]
+                            Hidden: True
+                        Range: 50
+                        Target: -1
+                        Filter: Self
+                        SkipAnim: True
+                        AutoTrigger: True
+        Infuse: Earth
+    Bottom:
+        Abilities:
+            BShield:
+                Shield:
+                    Amount: 1
+                    Enhancements: 1
+                ActiveBonusDuration: Round
+        Consumes:
+            BCEarth:
+                Elements: Earth
+                AbilityOverrides:
+                    BCEarthBuff:
+                        ParentName: BShield
+                        Strength: 1
+                XP: 1
+Layout:
+    Top:
+        - Rune: #GHEM, purely for layout unlike Augment
+            RuneIcon: Cragheart
+            ParentAbility: TTrap
+            RuneAbilityLayout:
+                - Row: "$1996001_T_2$"
+            NormalContentLayout:
+                - ColumnWidths: "0,80,20"
+                - Column:
+                    - Active: #Just need this so the XPTracker actually updates
+                        Ability: TActive
+                        ListLayout: ""
+                        Layout: ""
+                - Column: "$1996001_T_1$"
+                - Column:
+                    - Infuse: Earth
+    Bottom:
+        - Active:
+            Ability: BShield
+            ListLayout: "<b><size=130%>$Shield$ <sprite name=Shield> *BShield*"
+            Layout: "<b><size=130%>$Shield$ <sprite name=Shield> *BShield* <size=100%><voffset=1>@BShield@"
+            Icon: "Shield"
+        - Row: "<size=20%> "
+        - Consume:
+            Name: BCEarth
+            Text: "<nobr>+1 $Shield$ <sprite name=Shield></nobr>, <sprite name=XP1>"
+        - Row: "<size=20%> "
+        - Duration: Round

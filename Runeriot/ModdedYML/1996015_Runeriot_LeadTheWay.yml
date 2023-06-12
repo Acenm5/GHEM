@@ -1,0 +1,58 @@
+Parser: AbilityCard
+Name: $ABILITY_CARD_LeadTheWay$
+Character: RuneriotID
+ID: 1996015
+Level: X
+Initiative: 15
+Discard: [Lost,Discard]
+Data:
+    Top:
+        Abilities:
+            TRetaliate:
+                Retaliate:
+                    Amount: 2
+                    Enhancements: 1
+                ActiveBonusDuration: Round
+                AnimOverload: PowerUp
+            TRetaliateSubShield:
+                Shield:
+                    Amount: 1
+                    Enhancements: 1
+                ActiveBonusDuration: Round
+                AnimOverload: PowerUp
+        Infuse: Any
+        XP: 1
+    Bottom:
+        Abilities:
+            BMove:
+                Move:
+                    Amount: 4
+Layout:
+    Top:
+        - Active:
+            Ability: TRetaliate
+            Icon: Retaliate
+            ListLayout: "$Retaliate$ <sprite name=Retaliate> *TRetaliate*, $Self$"
+            Layout:
+                - Row: "<b><size=130%>$Retaliate$ <sprite name=Retaliate> *TRetaliate* <size=100%><voffset=1>@TRetaliate@"
+                - Row: "$Self$"
+        - Row: "<size=50%> "
+        - Active:
+            Ability: TRetaliateSubShield
+            Icon: Shield
+            ListLayout: "$Shield$ <sprite name=Shield> *TRetaliateSubShield*, $Self$"
+            Layout:
+                - Row: "<b><size=130%>$Shield$ <sprite name=Shield> *TRetaliateSubShield* <size=100%><voffset=1>@TRetaliateSubShield@"
+                - Row: "$Self$"
+        - Row: "<size=50%> "
+        - Row:
+            - ColumnWidths: "20,20,20,20"
+            - Column:
+            - Column:
+                - Infuse: Any
+            - Column:
+                - XP: 1
+            - Column:
+                - Duration: Round
+    Bottom:
+        - Row: "<b><size=130%>$Move$ <sprite name=Move> *BMove*"
