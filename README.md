@@ -26,7 +26,7 @@ As stated above, GHEM is not meant to impact the base video game. If you have GH
 
 ## MODDING WITH GHEM
 It is recommended to browse the Runeriot's ability cards to see the correct usage of current GHEM mechanics.
-- [ ] Create documentation akin to the official documentation at https://www.flamingfowlstudios.com/GloomhavenModding/docs-page.html
+- [ ] TO DO: Create documentation akin to the official documentation at https://www.flamingfowlstudios.com/GloomhavenModding/docs-page.html
 
 ## CONTRIBUTING TO GHEM
 GHEM was created using dnSpy 6.3.0 (https://github.com/dnSpy/dnSpy.git). Visit the tool's repository for instructions on getting started with it.
