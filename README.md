@@ -7,6 +7,9 @@ GHEM is a forever-free assembly edit of the digital edition of Gloomhaven. Its g
 2. fix bugs that are present in the latest released version of the game
 3. eventually facilitate the use of custom art resources within the game
 
+## SHOWCASE CLASS - RUNERIOT
+The Runeriot class mod was made to showcase what GHEM can currently do: https://steamcommunity.com/sharedfiles/filedetails/?id=2988379237
+
 ## INSTALLATION
 1. Download the GHEM repository.
 2. Locate the game's "Managed" folder, usually at C:\Program Files (x86)\Steam\steamapps\common\Gloomhaven\GH_Data\Managed OR C:\Program Files\Epic Games\Gloomhaven\GH_Data\Managed.
