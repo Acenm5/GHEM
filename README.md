@@ -9,7 +9,7 @@ GHEM is a forever-free assembly edit of the digital edition of Gloomhaven. Its g
 
 ## SHOWCASE CLASS - RUNERIOT
 The Runeriot class mod was made to showcase what GHEM can currently do:
-https://steamcommunity.com/sharedfiles/filedetails/?id=2988379237
+- https://steamcommunity.com/sharedfiles/filedetails/?id=2988379237
 
 ## INSTALLATION
 1. Download the GHEM repository.
