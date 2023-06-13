@@ -12,7 +12,7 @@ The Runeriot class mod was made to showcase what GHEM can currently do. GHEM mus
 - https://steamcommunity.com/sharedfiles/filedetails/?id=2988379237
 
 ## INSTALLATION
-1. Download the GHEM folder and unzip it. You can download it by clicking the Code<> button above the list of this repository's files.
+1. Download the GHEM folder and unzip it. You can download it by clicking the <> Code button above the list of this repository's files.
 2. Locate the game's "Managed" folder, usually at C:\Program Files (x86)\Steam\steamapps\common\Gloomhaven\GH_Data\Managed OR C:\Program Files\Epic Games\Gloomhaven\GH_Data\Managed.
    - on Steam, right-click Gloomhaven in your Library and choose "Manage > Browse Local Files" from the menu. Once in the Gloomhaven folder, navigate to "GH_Data" then "Managed" in your file explorer.
    - on Epic Games, click the 3-dot icon on Gloomhaven in your Library and choose "Manage" from the menu. In the new window, click the folder icon next to the "Uninstall" button. Once in the Gloomhaven folder, navigate to "GH_Data" then "Managed" in your file explorer.
