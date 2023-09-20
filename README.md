@@ -1,6 +1,9 @@
 # GHEM
 Gloomhaven Expanded Modding
 
+## GLOOMHAVEN UPDATE - SEPTEMBER 18TH, 2023
+The recent update has likely broken GHEM in numerous ways, though I have not had time to test this. As the dev team is currently working on bug fixes and other issues, I'll be focusing on other projects for the time being. Hopefully, by the time I return to this project, Gloomhaven will be receiving no more updates.
+
 ## ABOUT
 GHEM is a forever-free assembly edit of the digital edition of Gloomhaven. Its goals, in order of priority, are to:
 1. expand the game's modding framework to provide additional ability types, class mechanics, conditions, and card layout options
