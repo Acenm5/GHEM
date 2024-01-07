@@ -1,6 +1,9 @@
 # GHEM
 Gloomhaven Expanded Modding
 
+## JANUARY 2024
+Working on updating GHEM to use BepInEx, which would move the project away from dnspy and generally make everything easier.
+
 ## GLOOMHAVEN UPDATE - SEPTEMBER 18TH, 2023
 The recent update has likely broken GHEM in numerous ways, though I have not had time to test this. As the dev team is currently working on bug fixes and other issues, I'll be focusing on other projects for the time being. Hopefully, by the time I return to this project, Gloomhaven will be receiving no more updates.
 
