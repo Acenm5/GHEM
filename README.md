@@ -38,7 +38,7 @@ It is recommended to browse the Runeriot's ability cards to see the correct usag
 ## CONTRIBUTING TO GHEM
 GHEM was created using dnSpyEx 6.4.1 (https://github.com/dnSpyEx/dnSpy). Visit the tool's repository for instructions on getting started with it.
 
-So far, GHEM has only altered two of the game's assembled files - "GH.Runtime.dll" and "ScenarioRuleLibrary.dll" - and it is likely that your change should be in one of these files. All game mechanics (ability types, class mechanics, conditions, etc.) are defined within "ScenarioRuleLibrary.dll" and therefore any new ones should be there as well.
+So far, GHEM has only altered two of the game's assembled files - "GH.Runtime.dll" and "ScenarioRuleLibrary.dll" - and it is likely that your change should be in one of these files. All game mechanics (ability types, class mechanics, conditions, etc.) are defined within "ScenarioRuleLibrary.dll" and therefore any new ones should be there as well. "GH.Runtime.dll" handles user interfaces, card layouts, save data, etc.
 
 ### LEARN FROM MY CHANGES
 This git repo includes backups for the ScenarioRuleLibrary and GH.Runtime files. As a result, you can diff the files on your own device to see the alterations that were made (but keep in mind that some differences are just unimportant compiler-generated ones). There are two main ways to do this:
