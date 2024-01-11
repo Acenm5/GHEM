@@ -1,11 +1,12 @@
 # GHEM
 Gloomhaven Expanded Modding
 
-## JANUARY 2024
-Working on updating GHEM to use BepInEx, which would move the project away from dnspy and generally make everything easier.
+# 2024 and Next Steps
+GHEM has been updated to work with the latest official release as of January 2024 - however, the latest official release has bugs that (1) block the resuming of modded campaigns after closing/reopening the game and (2) limit the usefulness of the MoveTrap ability type, which is fortunately unused outside of one Runeriot card.
 
-## GLOOMHAVEN UPDATE - SEPTEMBER 18TH, 2023
-The recent update has likely broken GHEM in numerous ways, though I have not had time to test this. As the dev team is currently working on bug fixes and other issues, I'll be focusing on other projects for the time being. Hopefully, by the time I return to this project, Gloomhaven will be receiving no more updates.
+As such, there are two things to do before adding more features to GHEM:
+1. Fix the two aforementioned bugs, or find meaningful workarounds for them.
+2. Develop an injector, most likely using BepInEx, to replace the current implementation of GHEM (which requires manual readdition after the files are replaced with an official update).
 
 ## ABOUT
 GHEM is a forever-free assembly edit of the digital edition of Gloomhaven. Its goals, in order of priority, are to:
@@ -35,26 +36,31 @@ It is recommended to browse the Runeriot's ability cards to see the correct usag
 - [ ] TO DO: Create documentation akin to the official documentation at https://www.flamingfowlstudios.com/GloomhavenModding/docs-page.html
 
 ## CONTRIBUTING TO GHEM
-GHEM was created using dnSpy 6.3.0 (https://github.com/dnSpy/dnSpy.git). Visit the tool's repository for instructions on getting started with it.
+GHEM was created using dnSpyEx 6.4.1 (https://github.com/dnSpyEx/dnSpy). Visit the tool's repository for instructions on getting started with it.
 
 So far, GHEM has only altered two of the game's assembled files - "GH.Runtime.dll" and "ScenarioRuleLibrary.dll" - and it is likely that your change should be in one of these files. All game mechanics (ability types, class mechanics, conditions, etc.) are defined within "ScenarioRuleLibrary.dll" and therefore any new ones should be there as well.
+
+### LEARN FROM MY CHANGES
+This git repo includes backups for the ScenarioRuleLibrary and GH.Runtime files. As a result, you can diff the files on your own device to see the alterations that were made (but keep in mind that some differences are just unimportant compiler-generated ones). There are two main ways to do this:
+1. Download and install dotpeek (https://www.jetbrains.com/decompiler/) and use its Compare function to compare the altered and unaltered .dlls - this is the method that I use and have had great success with
+2. Use an assembly decompiler like ILSpy to decompile, then Save Code to Visual Studio projects (or similar), then finally use WinMerge with recursion to show the differences - I have not attempted this method but it should work
 
 ### TIPS
 It is recommended to take some time looking around the file assembly within dnSpy and experimenting with its UI. Initially, it can be quite daunting. For questions and help, I can be reached directly on Discord with the username **acenm5**. Some of my general tips are below:
 1. Some classes (sections of files) are VERY large. Ctrl + F is your friend.
-2. A single new mechanic will often require additions to multiple classes that reference each other. **MAKE SURE TO NOT REFERENCE SOMETHING THAT DOESN'T EXIST IN THE SAVED FILE YET.** For a new ability, this would mean making the new ability class first, SAVING, then referencing it with the parser and anything else.
-3. If unfamiliar errors are thrown when you try to save an edit, first save your changes in a Notepad document or similar place, then restart dnSpy and retry.
+2. A single new mechanic will often require additions to multiple classes that reference each other. **MAKE SURE TO NOT REFERENCE SOMETHING THAT DOESN'T EXIST IN THE SAVED FILE YET.** For a new ability, this would mean making the new ability class first, SAVING, then referencing it with the parser (see 4) and anything else.
+3. If unfamiliar errors are thrown when you try to save an edit, first save your changes in a Notepad document or similar place, then restart dnSpy and retry. Reopening dnspy after you save a change can help relieve these headaches.
 4. New mechanics have to be added to the YML Parser in ScenarioRuleLibrary.YML.AbilityData.ParseAbilityProperties() at very specific places, depending on the name of the mechanic. If you know how, you can translate the name to a UINT yourself and find the right place, but GHEM will also show you the UINT in the validation log when you attempt (and fail) to validate a mod that has your new ability in its ability card YMLs.
    - There are many YML parsers, and therefore no guarantee that the relevant parser has this UINT-checker implemented for you. If you add a UINT-checker to a parser, keep it in your commit so that others can benefit.
-5. Gloomhaven keeps logs at C:\Users\YourUsername\AppData\LocalLow\FlamingFowlStudios\Gloomhaven, which can come in handy for debugging. "Player.log" is long and detailed, while "Simple.log" is, obviously, simpler. Write to "Simple.log" by pasting in the following header and code snippet:
+5. Gloomhaven keeps logs at C:\Users\YourUsername\AppData\LocalLow\FlamingFowlStudios\Gloomhaven, which can come in handy for debugging. "Player.log" is long and detailed, but it is now your only option since Simple.Log was removed during the Saber updates.
 ```
-using SharedLibrary.SimpleLog;
+using SharedLibrary.Logger;
 ...
-SimpleLog.AddToSimpleLog("This would be added to the log.", true);
+DLLDebug.Log("This would be your debug message to later be viewed in Player.log");
 ```
 
 #### Predicates (Func)
-**Predicates are not handled well by dnSpy. They look something like this when decompiled:**
+**Predicates are not handled well by dnSpy, but luckily you can just delete them without issue. They look something like this when decompiled:**
 ```
 Func<MonsterYMLData, bool> <>9__17;
 for (i = 0; i < 4; i = i4 + 1)
@@ -76,12 +82,11 @@ for (i = 0; i < 4; i = i4 + 1)
 
 **You need to clean this up before you can save your edits. A clean version of the code above is below:**
 ```
-Func<MonsterYMLData, bool> predicate;
 for (i = 0; i < 4; i = i4 + 1)
 {
     IEnumerable<MonsterYMLData> monsters2 = ScenarioRuleClient.SRLYML.Monsters;
     Func<MonsterYMLData, bool> func5;
-    func5 = (predicate = (MonsterYMLData s) => s.ID == summonNamesList[i]);
+    func5 = (MonsterYMLData s) => s.ID == summonNamesList[i];
     Func<MonsterYMLData, bool> func6 = func5;
     if (monsters2.SingleOrDefault(func6) != null)
     {
@@ -109,5 +114,15 @@ internal sealed class PrivateImplementationDetails
         }
         return num;
     }
+}
+```
+
+#### System.Runtime.CompilerServices.CompilerGenerated
+**You may see this code when trying to compile something in GH.Runtime.dll - if you do, just delete the code in its entirety. Many errors will magically disappear.**
+```
+[global::System.Runtime.CompilerServices.CompilerGenerated]
+internal static float <ProcessRowCollection>g__GetAnchorYCountingFromTop|76_0(int i, ref global::CreateLayout.<>c__DisplayClass76_0)
+{
+	return default(float);
 }
 ```
