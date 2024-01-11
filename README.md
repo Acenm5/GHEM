@@ -42,7 +42,7 @@ So far, GHEM has only altered two of the game's assembled files - "GH.Runtime.dl
 
 ### LEARN FROM MY CHANGES
 This git repo includes backups for the ScenarioRuleLibrary and GH.Runtime files in the DLLBackups folder. As a result, you can diff the files on your own device to see the alterations that were made (but keep in mind that some differences are just unimportant compiler-generated ones). There are two main ways to do this:
-1. Download and install dotpeek (https://www.jetbrains.com/decompiler/) and use its Compare function to compare the altered and unaltered .dlls - this is the method that I use and have had great success with.
+1. Download and install dotPeek (https://www.jetbrains.com/decompiler/) and use its Compare function to compare the altered and unaltered .dlls - this is the method that I use and have had great success with.
 2. Use an assembly decompiler like ILSpy (https://github.com/icsharpcode/ILSpy/releases) to decompile, then Save Code to Visual Studio projects (or similar), then finally use WinMerge (https://winmerge.org/downloads/?lang=en) with recursion to show the differences - I have not attempted this method but it should work.
 
 ### TIPS
