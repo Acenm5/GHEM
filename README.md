@@ -2,11 +2,7 @@
 Gloomhaven Expanded Modding
 
 # 2024 and Next Steps
-GHEM has been updated to work with the latest official release as of January 2024 - however, the latest official release has bugs that (1) block the resuming of modded campaigns after closing/reopening the game and (2) limit the usefulness of the MoveTrap ability type, which is fortunately unused outside of one Runeriot card.
-
-As such, there are two things to do before adding more features to GHEM:
-1. Fix the two aforementioned bugs, or find meaningful workarounds for them.
-2. Develop an injector, most likely using BepInEx, to replace the current implementation of GHEM (which requires manual readdition after the files are replaced with an official update).
+GHEM has been updated to work with the latest official release as of January 2024, and it fixes the bug that renders modded saves unusable! The next big undertaking will be developing an injector, most likely using BepInEx, to replace the current implementation of GHEM (which requires manual readdition after the files are replaced with an official update). This will likely take a while.
 
 ## ABOUT
 GHEM is a forever-free assembly edit of the digital edition of Gloomhaven. Its goals, in order of priority, are to:
@@ -44,6 +40,8 @@ So far, GHEM has only altered two of the game's assembled files - "GH.Runtime.dl
 This git repo includes backups for the ScenarioRuleLibrary and GH.Runtime files in the DLLBackups folder. As a result, you can diff the files on your own device to see the alterations that were made (but keep in mind that some differences are just unimportant compiler-generated ones). There are two main ways to do this:
 1. Download and install dotPeek (https://www.jetbrains.com/decompiler/) and use its Compare function to compare the altered and unaltered .dlls - this is the method that I use and have had great success with.
 2. Use an assembly decompiler like ILSpy (https://github.com/icsharpcode/ILSpy/releases) to decompile, then Save Code to Visual Studio projects (or similar), then finally use WinMerge (https://winmerge.org/downloads/?lang=en) with recursion to show the differences - I have not attempted this method but it should work.
+
+In the same DLLBackups folder, you can find the original GHEMNotes text file with all of GHEM's changes recorded in shorthand. Feel free to use it while diffing the files to sift out compiler-generated differences.
 
 ### TIPS
 It is recommended to take some time looking around the file assembly within dnSpy and experimenting with its UI. Initially, it can be quite daunting. For questions and help, I can be reached directly on Discord with the username **acenm5**. Some of my general tips are below:
