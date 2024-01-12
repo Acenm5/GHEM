@@ -1,0 +1,1375 @@
+This is the original way I tracked my changes. If you want to use this, keep these things in mind: some variable
+names may be different on your device, "where" indicators (besides file/class/method names) are usually missing,
+and different line starts designate different types of changes:
+++ designates a pure addition
+-- designates a pure removal
+-+ designates a replacement
+
+-----------------------------------------------------------------------------------------------------------
+---------------------------------------TRAPS CAN ACTIVATE ABILITIES---------------------------------------
+-----------------------------------------------------------------------------------------------------------
+The basis of runes, which have abilities activate when they get triggered.
+
+ScenarioRuleLibrary.YML.AbilityData.TrapData
+	++ public bool TriggeredTrapAbility
+	++ public int TrapCardID
+	.Copy()
+		++ TriggeredTrapAbility = this.TriggeredTrapAbility
+		++ TrapCardID = this.TrapCardID
+
+ScenarioRuleLibrary.YML.AbilityData.ParseTrapData
+	-- anything having to do with placementtilefilter
+	numchecker says 2083018717
+	++ else if (text == "TriggeredTrapAbility")
+	{
+		bool flag2 = false;
+		if (YMLShared.GetBoolPropertyValue(mappingEntry.Value, "TrapData/TriggeredTrapAbility", filename, out flag2))
+		{
+			trapData.TriggeredTrapAbility = flag2;
+			if (flag2)
+			{
+				string text2 = string.Empty;
+				filename = filename.Substring(filename.LastIndexOf('/') + 1);
+				for (int i = 0; i < filename.Length; i++)
+				{
+					if (char.IsDigit(filename[i]))
+					{
+						text2 += filename[i].ToString();
+					}
+				}
+				int num3;
+				if (text2 != string.Empty && int.TryParse(text2, out num3))
+				{
+					trapData.TrapCardID = num3;
+				}
+				continue;
+			}
+		}
+		flag = false;
+		continue;
+	}
+
+ScenarioRuleLibrary.CObjectTrap
+	++ public bool TriggeredTrapAbility { get; private set; }
+	++ public int TrapCardID { get; private set; }
+	.public override void GetObjectData(SerializationInfo info, StreamingContext context)
+		++ info.AddValue("TriggeredTrapAbility", this.TriggeredTrapAbility);
+		++ info.AddValue("TrapCardID", this.TrapCardID);
+	.public CObjectTrap(SerializationInfo info, StreamingContext context)
+		++ if (name == "TriggeredTrapAbility")
+		{
+			this.TriggeredTrapAbility = info.GetBoolean("TriggeredTrapAbility");
+		}
+		if (name == "TrapCardID")
+		{
+			this.TrapCardID = info.GetInt32("TrapCardID");
+		}
+								
+	.public CObjectTrap( the one that ends with AbilityData.TrapData trapData )
+		++ this.TriggeredTrapAbility = trapData.TriggeredTrapAbility;
+		++ this.TrapCardID = trapData.TrapCardID;
+	.public override bool Activate
+		++ if (actor.m_OnTrapTriggeredListeners != null)
+		{
+			actor.m_OnTrapTriggeredListeners(this, actor);
+		}
+
+ScenarioRuleLibrary.CActiveBonus.EActiveBonusBehaviourType
+	++ public const CActiveBonus.EActiveBonusBehaviourType DuringActionAbilityOnTrapTrigger = 66;
+	++ public const CActiveBonus.EActiveBonusBehaviourType DuringActionAbilityOnSpecificTrapTrigger = 67;
+
+ScenarioRuleLibrary.CActiveBonus.CreateActiveBonus
+	++ case CActiveBonus.EActiveBonusBehaviourType.DuringActionAbilityOnTrapTrigger:
+	++ case CActiveBonus.EActiveBonusBehaviourType.DuringActionAbilityOnSpecificTrapTrigger:
+
+++ CDuringActionAbilityActiveBonus_TriggerAbilityOnTrapTrigger (this is a new class based off FinishedMovement)
+	++ OnCarried method from MovedORCarried
+	-+ Replaced RequirementsMet with the one from MoveORCarried
+	++ public override void OnTrapTriggered(CObjectTrap trap, CActor movedActor)
+		{
+			if ((movedActor.Type == CActor.EType.Enemy || movedActor.Type == CActor.EType.Enemy2 || movedActor.OriginalType == CActor.EType.Neutral) && this.m_ActiveBonus.IsActiveBonusToggledAndNotRestricted(movedActor))
+			{
+				this.DoAbility(movedActor);
+			}
+		}
+
+++ CDuringActionAbilityActiveBonus_TriggerAbilityOnSpecificTrapTrigger (this is a new class based off above)
+	++ public override void OnTrapTriggered(CObjectTrap trap, CActor movedActor)
+	{
+		if (this.m_ActiveBonusData.ActiveBonusCardID == trap.TrapCardID)
+		{
+			if ((movedActor.Type == CActor.EType.Enemy || movedActor.Type == CActor.EType.Enemy2 || movedActor.OriginalType == CActor.EType.Neutral) && this.m_ActiveBonus.IsActiveBonusToggledAndNotRestricted(movedActor))
+			{
+				this.DoAbility(movedActor);
+			}
+			base.Finish();
+		}
+	}
+
+ScenarioRuleLibrary.CDuringActionAbilityActiveBonus
+	++ case CActiveBonus.EActiveBonusBehaviourType.DuringActionAbilityOnTrapTrigger:
+		this.m_BespokeBehaviour = new CDuringActionAbilityActiveBonus_TriggerAbilityOnTrapTrigger(actor, ability, this);
+		return;
+	++ case CActiveBonus.EActiveBonusBehaviourType.DuringActionAbilityOnSpecificTrapTrigger:
+		this.m_BespokeBehaviour = new CDuringActionAbilityActiveBonus_TriggerAbilityOnSpecificTrapTrigger(actor, ability, this);
+		return;
+
+ScenarioRuleLibrary.CActor
+	++ public delegate void TrapTriggeredListener(CObjectTrap trap, CActor actor);
+	++ public CActor.TrapTriggeredListener m_OnTrapTriggeredListeners;
+
+ScenarioRuleLibrary.CBespokeBehaviour
+	++ OnTrapTriggered(CObjectTrap trap, CActor actor){}
+
+ScenarioRuleLibrary.CBespokeBehaviour.AddListeners and .RemoveListeners and .RefreshListeners
+	++ cactor.m_OnTrapTriggeredListeners = (CActor.TrapTriggeredListener)Delegate.Combine(cactor.m_OnTrapTriggeredListeners, new CActor.TrapTriggeredListener(this.OnTrapTriggered));
+
+ScenarioRuleLibrary.YML.ActiveBonusData
+	++ public int ActiveBonusCardID;
+
+ScenarioRuleLibrary.YML.ActiveBonusData.Copy()
+	++ activeBonusData.ActiveBonusCardID = this.ActiveBonusCardID;
+
+ScenarioRuleLibrary.YML.AbilityData.ParseActiveBonusDuration()
+	++ string text = string.Empty;
+	filename = filename.Substring(filename.LastIndexOf('/') + 1);
+	for (int i = 0; i < filename.Length; i++)
+	{
+		if (char.IsDigit(filename[i]))
+		{
+			text += filename[i].ToString();
+		}
+	}
+	int num;
+	if (text != string.Empty && int.TryParse(text, out num))
+	{
+		activeBonusData.ActiveBonusCardID = num;
+	}
+
+-----------------------------------------------------------------------------------------------------------
+---------------------------------------NEW ABILITY: MERGEDPUSHCREATE---------------------------------------
+-----------------------------------------------------------------------------------------------------------
+Needed specifically for Tectonic Plate, but it's also a fair ability in its own right.
+
+++ ScenarioRuleLibrary.CAbilityMergedPushCreate (new class based off of MergedKillCreate)
+	-+ replaced all mention of Kill with Push
+	-+ (!this.m_MergedPushAbilityCopy.HasPassedState(CAbilityPush.EPushState.ActorIsSelectingPushTile) 
+	-+ (!this.m_MergedPushAbilityCopy.HasPassedState(CAbilityPush.EPushState.ActorFinalizePush)
+
+++ ScenarioRuleLibrary.CAbilityPush.HasPassedState()
+	++ added this whole method from CAbilityTargeting to get MergedPushCreate to work
+
+++ ScenarioRuleLibrary.CAbility.EAbilityType.MergedPushCreate (new enumerator option)
+
+ScenarioRule.CAbility.CreateAbility()
+	++ case CAbility.EAbilityType.MergedPushCreate:
+		cability = new CAbilityMergedPushCreate((CAbilityPush)mergedAbilities[0], (CAbilityCreate)mergedAbilities[1]);
+		goto IL_7B5;
+
+ScenarioRuleLibrary.YML.AbilityData.ParseAbilityProperties()
+	++ if (text == "MergedPushCreate")
+	{
+		Mapping mapping4;
+		if (YMLShared.GetMapping(mappingEntry, filename, out mapping4, false))
+		{
+			using (List<MappingEntry>.Enumerator enumerator5 = mapping4.Entries.GetEnumerator())
+			{
+				while (enumerator5.MoveNext())
+				{
+					MappingEntry mappingEntry4 = enumerator5.Current;
+					string text7 = mappingEntry4.Key.ToString();
+					if (text7 != null && text7 == "Abilities")
+					{
+						List<CAbility> list6;
+						if (CardProcessingShared.GetAbilities(mappingEntry4, cardID, isMonster, filename, out list6, true))
+						{
+							abilityType = new CAbility.EAbilityType?(CAbility.EAbilityType.MergedPushCreate);
+							mergedAbilities = list6;
+						}
+						else
+						{
+							flag = false;
+						}
+					}
+					else
+					{
+						SharedClient.ValidationRecord.RecordParseFailure(filename, "Unable to process MergedPushCreate.  Entry " + mappingEntry4.Key.ToString() + " was not recognised.  File: " + filename);
+						flag = false;
+					}
+				}
+				continue;
+			}
+		}
+		flag = false;
+		continue;
+	}
+
+GH.Runtime.SkipButton.OnClick()
+	++ else if (currentAbility != null && currentAbility.AbilityType == CAbility.EAbilityType.Push)
+	{
+		currentAbility.SetCancelAbilityFlag(true);
+	}
+
+-----------------------------------------------------------------------------------------------------------
+----------------------------------------ACTIVE BONUS CAN USE MERGED----------------------------------------
+-----------------------------------------------------------------------------------------------------------
+Again, specifically for the Earth Rune since it uses a merged ability on its trigger.
+
+ScenarioRuleLibrary.CAbilityMergedPushCreate.Start()
+	++ if (this.m_MergedPushAbilityCopy == null) this.CopyMergedAbilities();
+	++ if (base.InlineSubAbilityTiles != null && base.InlineSubAbilityTiles.Count > 0)
+		{
+			this.m_MergedPushAbilityCopy.InlineSubAbilityTiles = base.InlineSubAbilityTiles;
+		}
+
+ScenarioRuleLibrary.CAbilityCreate.Perform()
+	Note for below: the last qualifier was removed so that the obstacle could be created if actor died
+	++ if (mergedWithAbility != null && mergedWithAbility.InlineSubAbilityTiles != null && mergedWithAbility.InlineSubAbilityTiles.Count > 0 ----&& !mergedWithAbility.AbilityHasBeenCancelled----)
+	{
+		base.TilesInRange.Clear();
+		foreach (CTile ctile8 in mergedWithAbility.InlineSubAbilityTiles)
+		{
+			AbilityData.MiscAbilityData miscAbilityData9 = base.MiscAbilityData;
+			if (miscAbilityData9 != null && miscAbilityData9.UseMergedWithAbilityTiles != null)
+			{
+				AbilityData.MiscAbilityData miscAbilityData10 = base.MiscAbilityData;
+				if (miscAbilityData10 != null && miscAbilityData10.UseMergedWithAbilityTiles.Value)
+				{
+					base.TilesInRange.Add(ctile8);
+					continue;
+				}
+			}
+			CActor cactor2 = ScenarioManager.Scenario.FindActorAt(ctile8.m_ArrayIndex, null, false, false);
+			if (cactor2 != null)
+			{
+				this.m_ActorsToIgnore.Add(cactor2);
+			}
+			base.TilesInRange.AddRange(GameState.GetTilesInRange(ctile8.m_ArrayIndex, this.m_Range, base.Targeting, false, false, null, false, false, false, false, true, false, false, false, false, false));
+		}
+	}
+
+ScenarioRuleLibrary.CAbilityPush.SetTargets() - the part that only happens if the count is 1
+	++ if (base.IsMergedAbility)
+	{
+		base.InlineSubAbilityTiles.Clear();
+		base.InlineSubAbilityTiles.Add(ScenarioManager.Tiles[this.m_CurrentTarget.ArrayIndex.X, this.m_CurrentTarget.ArrayIndex.Y]);
+	}
+
+			--------------------UNTESTED--------------------
+
+ScenarioRuleLibrary.CAbilityMergedMoveObstacleAttack.Start()
+	++ if (this.m_MergedMoveObstacleAbilityCopy == null) this.CopyMergedAbilities();
+
+ScenarioRuleLibrary.CAbilityMergedMoveAttack.Start()
+	++ if (this.m_MergedMoveAbilityCopy == null) this.CopyMergedAbilities();
+
+ScenarioRuleLibrary.CAbilityMergedKillCreate.Start()
+	++ if (this.m_MergedKillAbilityCopy == null) this.CopyMergedAbilities();
+
+ScenarioRuleLibrary.CAbilityMergedDisarmTrapDestroyObstacle.Start()
+	++ if (this.m_MergedDestroyObstacleAbilityCopy == null) this.CopyMergedAbilities();
+
+ScenarioRuleLibrary.CAbilityMergedDestroyAttack.Start()
+	++ if (this.m_MergedDestroyObstacleAbilityCopy == null) this.CopyMergedAbilities();
+
+ScenarioRuleLibrary.CAbilityMergedCreateAttack.Start()
+	++ if (this.m_MergedCreateAbilityCopy == null) this.CopyMergedAbilities();
+
+-----------------------------------------------------------------------------------------------------------
+-------------------------------------------IMPROVED RUNE LAYOUT-------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+We should try to make things look nice, if possible.
+
+ScenarioRuleLibrary.CardLayoutGroup
+	.DataTypes and .GroupTypes
+		++ Rune
+	++ public CardLayoutGroup.RuneLayout Rune { get; private set; }
+	++ public void CreateRuneData(CardLayoutGroup.RuneLayout runeLayout)
+	{
+		this.DataType = CardLayoutGroup.DataTypes.Rune;
+		this.Rune = runeLayout;
+	}
+	++ public class RuneLayout (this is a new layout based off of AugmentLayout)
+	{
+		public string RuneIcon { get; private set; }
+
+		public string DiscardText { get; private set; }
+
+		public CardLayout RuneAbilityLayout { get; private set; }
+
+		public CardLayout NormalContentLayout { get; private set; }
+
+		public RuneLayout(string runeIcon, string discardText, CardLayout runeAbilityLayout, CardLayout normalContentLayout)
+		{
+			this.RuneIcon = runeIcon;
+			this.DiscardText = discardText;
+			this.RuneAbilityLayout = runeAbilityLayout;
+			this.NormalContentLayout = normalContentLayout;
+		}
+	}
+
+++ GH.Runtime.RuneContainer (new class based off AugmentContainer with an explicit conversion from it)
+	++ public static explicit operator RuneContainer(AugmentContainer b) => new RuneContainer(b);
+	++ public RuneContainer(AugmentContainer augmentContainer)
+	{
+		this.RuneKeywordText = augmentContainer.AugmentKeywordText;
+		this.RuneIcon = augmentContainer.AugmentIcon;
+		this.OnEnemySpringText = augmentContainer.OnYourMeleeAttacksText;
+		this.RuneEffectContainer = augmentContainer.AugmentEffectContainer;
+		this.CardContentContainer = augmentContainer.CardContentContainer;
+		this.PersistentIcon = augmentContainer.PersistentIcon;
+		this.DiscardReminderText = augmentContainer.DiscardReminderText;
+	}
+
+GH.Runtime.CreateLayout.CreateFullLayoutText()
+	++ case CardLayoutGroup.DataTypes.Rune:
+		this.CreateRune(group.Rune, container.transform);
+		break;
+	
+	New method based off of CreateAugment:
+	++ private void CreateRune(CardLayoutGroup.RuneLayout rune, Transform parent, CardEnhancementElements enhancementElements)
+	{
+		RuneContainer runeContainer = (RuneContainer)UnityEngine.Object.Instantiate<AugmentContainer>(AssetBundleManager.Instance.LoadAssetFromBundle<GameObject>("misc_gui", "AugmentContainer", "gui", "prefab", null, false).GetComponent<AugmentContainer>(), parent);
+		RectTransform rectTransform = parent.transform as RectTransform;
+		rectTransform.anchorMin = new Vector2(0f, 0f);
+		rectTransform.anchorMax = new Vector2(1f, 1f);
+		parent.name = "RuneRow";
+		runeContainer.RuneKeywordText.text = CreateLayout.LocaliseText("$Rune$", false);
+		runeContainer.OnEnemySpringText.text = CreateLayout.LocaliseText("$Rune_OnEnemySpring$", false);
+		if (rune.DiscardText == null)
+		{
+			runeContainer.DiscardReminderText.text = CreateLayout.LocaliseText("$Rune_DiscardReminder$", false);
+		}
+		else
+		{
+			runeContainer.DiscardReminderText.text = CreateLayout.LocaliseText(rune.DiscardText, false);
+		}
+		runeContainer.RuneIcon.sprite = UIInfoTools.Instance.GetActiveAbilityIcon(rune.RuneIcon, null, true);
+		runeContainer.PersistentIcon.sprite = UIInfoTools.Instance.GetDurationIcon(CActiveBonus.EActiveBonusDurationType.Persistent);
+		float num = 4f;
+		LayoutElement component = runeContainer.RuneEffectContainer.GetComponent<LayoutElement>();
+		CreateLayout createLayout = new CreateLayout(rune.RuneAbilityLayout.ParentGroup, new Rect(0f, 0f, component.preferredWidth - num, component.preferredHeight - num), this._layoutID, false, enhancementElements, false, null, false, FullAbilityCardAction.CardHalf.NA);
+		createLayout.FullLayout.transform.SetParent(runeContainer.RuneEffectContainer.transform);
+		createLayout.GenerateFullLayout(true, false, false);
+		(createLayout.FullLayout.transform as RectTransform).anchoredPosition = Vector2.zero;
+		(createLayout.FullLayout.transform as RectTransform).pivot = new Vector2(0.5f, 0.5f);
+		LayoutElement component2 = runeContainer.CardContentContainer.GetComponent<LayoutElement>();
+		CreateLayout createLayout2 = new CreateLayout(rune.NormalContentLayout.ParentGroup, new Rect(0f, 0f, component2.preferredWidth - num, component2.preferredHeight - num), this._layoutID, false, enhancementElements, false, null, false, FullAbilityCardAction.CardHalf.NA);
+		createLayout2.FullLayout.transform.SetParent(runeContainer.CardContentContainer.transform);
+		createLayout2.GenerateFullLayout(true, false, false);
+		(createLayout2.FullLayout.transform as RectTransform).anchoredPosition = Vector2.zero;
+		(createLayout2.FullLayout.transform as RectTransform).pivot = new Vector2(0.5f, 0.5f);
+	}
+
+ScenarioRuleLibrary.CardLayout.CreateChildren()
+	++ added numchecker (2422155677)
+	++ if (text == "Rune")
+	{
+		list2.Add(mappingEntry);
+		continue;
+	}
+	++ if (text5 == "Rune")
+	{
+		string text29 = null;
+		string text30 = null;
+		CAbility cability7 = null;
+		string text31 = null;
+		CardLayout cardLayout4 = null;
+		CardLayout cardLayout5 = null;
+		foreach (MappingEntry mappingEntry7 in (mappingEntry4.Value as Mapping).Entries)
+		{
+			string text32 = mappingEntry7.Key.ToString();
+			if (text32 != null)
+			{
+				if (!(text32 == "ParentAbility"))
+				{
+					if (!(text32 == "ActiveBonusLayout"))
+					{
+						if (!(text32 == "RuneAbilityLayout"))
+						{
+							if (!(text32 == "NormalContentLayout"))
+							{
+								if (!(text32 == "RuneIcon"))
+								{
+									if (text32 == "DiscardText")
+									{
+										string text33;
+										if (YMLShared.GetStringPropertyValue(mappingEntry7.Value, "DiscardText", this.FileName, out text33))
+										{
+											text30 = text33;
+											continue;
+										}
+										continue;
+									}
+								}
+								else
+								{
+									string text34;
+									if (YMLShared.GetStringPropertyValue(mappingEntry7.Value, "RuneIcon", this.FileName, out text34))
+									{
+										text29 = text34;
+										continue;
+									}
+									continue;
+								}
+							}
+							else if (mappingEntry7.Value is Sequence)
+							{
+								Sequence sequence5;
+								if (YMLShared.GetSequence(mappingEntry7.Value, "Rune/NormalContentLayout", this.FileName, out sequence5))
+								{
+									cardLayout5 = new CardLayout(sequence5, linkedAbilities, consumes, this.AbilityCardName, this.DiscardType, this.FileName, null);
+									continue;
+								}
+								continue;
+							}
+							else
+							{
+								if (mappingEntry7.Value is Scalar)
+								{
+									cardLayout5 = new CardLayout((mappingEntry7.Value as Scalar).Text, linkedAbilities, this.AbilityCardName, this.DiscardType, this.FileName);
+									continue;
+								}
+								continue;
+							}
+						}
+						else if (mappingEntry7.Value is Sequence)
+						{
+							Sequence sequence6;
+							if (YMLShared.GetSequence(mappingEntry7.Value, "Rune/RuneAbilityLayout", this.FileName, out sequence6))
+							{
+								cardLayout4 = new CardLayout(sequence6, linkedAbilities, consumes, this.AbilityCardName, this.DiscardType, this.FileName, null);
+								continue;
+							}
+							continue;
+						}
+						else
+						{
+							if (mappingEntry7.Value is Scalar)
+							{
+								cardLayout4 = new CardLayout((mappingEntry7.Value as Scalar).Text, linkedAbilities, this.AbilityCardName, this.DiscardType, this.FileName);
+								continue;
+							}
+							continue;
+						}
+					}
+					else
+					{
+						string text35;
+						if (YMLShared.GetStringPropertyValue(mappingEntry7.Value, "ActiveBonusLayout", this.FileName, out text35))
+						{
+							text31 = new CardLayoutRow(text35, this.AbilityCardName, linkedAbilities, overrides).PropertyLookup(text35, linkedAbilities);
+							continue;
+						}
+						continue;
+					}
+				}
+				else
+				{
+					string text43;
+					if (!YMLShared.GetStringPropertyValue(mappingEntry7.Value, "ParentAbility", this.FileName, out text43))
+					{
+						continue;
+					}
+					foreach (CAbility cability8 in list6)
+					{
+						if (cability8.Name == text43)
+						{
+							cability7 = cability8;
+						}
+					}
+					if (cability7 == null)
+					{
+						SharedClient.ValidationRecord.RecordParseFailure(this.FileName, "Active ability name " + text43 + " not found in linked abilities.\nFile: " + this.FileName);
+						continue;
+					}
+					continue;
+				}
+			}
+			YMLValidationRecord validationRecord4 = SharedClient.ValidationRecord;
+			string fileName4 = this.FileName;
+			string text37 = "Invalid Rune entry ";
+			DataItem key4 = mappingEntry7.Key;
+			validationRecord4.RecordParseFailure(fileName4, text37 + ((key4 != null) ? key4.ToString() : null) + " in layout section.\nFile: " + this.FileName);
+		}
+		bool flag8 = true;
+		if (cardLayout4 == null || cardLayout5 == null)
+		{
+			SharedClient.ValidationRecord.RecordParseFailure(this.FileName, "Both RuneAbilityLayout and NormalContentLayout required for Rune in layout section.\nFile: " + this.FileName);
+			flag8 = false;
+		}
+		if (text29 == null)
+		{
+			SharedClient.ValidationRecord.RecordParseFailure(this.FileName, "RuneIcon required for Rune in layout section. \nFile: " + this.FileName);
+		}
+		if (flag8)
+		{
+			CardLayoutGroup cardLayoutGroup13 = new CardLayoutGroup(CardLayoutGroup.GroupTypes.Rune);
+			cardLayoutGroup13.CreateRuneData(new CardLayoutGroup.RuneLayout(text29, text30, cardLayout4, cardLayout5));
+			list14.Add(cardLayoutGroup13);
+			continue;
+		}
+		continue;
+	}
+
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------NEW ABILITY: PLACETERRAIN-----------------------------------------
+-----------------------------------------------------------------------------------------------------------
+The Mirefoot from Crimson Scales would make great use of this. It places difficult/hazardous terrain.
+
+++ ScenarioRuleLibrary.CAbility.EAbilityType.PlaceTerrain (new enumerator option)
+
+ScenarioRuleLibrary.CAbility()
+	++ case CAbility.EAbilityType.PlaceTerrain:
+		cability = new CAbilityPlaceTerrain(propName);
+		goto IL_7E4;
+	++ string text = ((ability is CAbilityCreate) ? (ability as CAbilityCreate).PropName : ((ability is CAbilityPlaceTerrain) ? (ability as CAbilityPlaceTerrain).PropName : string.Empty));
+	++ if (abilityOverride.PropName != null && this is CAbilityPlaceTerrain)
+	{
+		(this as CAbilityPlaceTerrain).PropName = (abilityOverride.OriginalAbility as CAbilityPlaceTerrain).PropName;
+	}
+	++ if (abilityOverride.PropName != null && this is CAbilityPlaceTerrain)
+	{
+		(this as CAbilityPlaceTerrain).PropName = abilityOverride.PropName;
+	}
+	
+
+++ ScenarioRuleLibrary.CAbilityPlaceTerrain (new class based off of Create)
+	-+ replaced all references to obstacles with terrain
+	-- removed all references to Mf.IsBlockingSpawnPosition since that's only needed for obstacles
+	++ if (base.IsInlineSubAbility && base.InlineSubAbilityTiles != null && base.InlineSubAbilityTiles.Count == 1)
+	{
+		List<CActor> list = ScenarioManager.Scenario.FindActorsAt(base.InlineSubAbilityTiles[0].m_ArrayIndex, null, false, false);
+		if (list != null && list.Count > 0)
+		{
+			if (list.Count > 1 && base.AbilityFilter.IsValidTarget(list[1], base.TargetingActor, base.IsTargetedAbility, false, new bool?(false), false))
+			{
+				this.m_InlineTarget = list[1];
+			}
+			else if (list[0] != null && base.AbilityFilter.IsValidTarget(list[0], base.TargetingActor, base.IsTargetedAbility, false, new bool?(false), false))
+			{
+				this.m_InlineTarget = list[0];
+			}
+		}
+	}
+	++ switch (this.PropName)
+		case "TerrainHotCoals":
+			CObjectHazardousTerrain cobjectTerrain = new CObjectHazardousTerrain(this.PropName, ScenarioManager.ObjectImportType.TerrainHotCoals, new TileIndex(ctile12.m_ArrayIndex), null, new CVector3(0f, num3, 0f), base.TargetingActor, ctile12.m_HexMap.MapGuid);
+			ctile12.SpawnProp(cobjectTerrain, true, base.SpawnDelay);
+			this.m_PropsSpawned++;
+			break;
+		case "TerrainThorns":
+			CObjectHazardousTerrain cobjectTerrain2 = new CObjectHazardousTerrain(this.PropName, ScenarioManager.ObjectImportType.TerrainThorns, new TileIndex(ctile12.m_ArrayIndex), null, new CVector3(0f, num3, 0f), base.TargetingActor, ctile12.m_HexMap.MapGuid);
+			ctile12.SpawnProp(cobjectTerrain2, true, base.SpawnDelay);
+			this.m_PropsSpawned++;
+			break;
+		case "TerrainWater":
+			CObjectDifficultTerrain cobjectTerrain3 = new CObjectDifficultTerrain(this.PropName, ScenarioManager.ObjectImportType.TerrainWater, new TileIndex(ctile12.m_ArrayIndex), null, new CVector3(0f, num3, 0f), base.TargetingActor, ctile12.m_HexMap.MapGuid, false, null);
+			ctile12.SpawnProp(cobjectTerrain3, true, base.SpawnDelay);
+			this.m_PropsSpawned++;
+			break;
+		case "TerrainRubble":
+			CObjectDifficultTerrain cobjectTerrain4 = new CObjectDifficultTerrain(this.PropName, ScenarioManager.ObjectImportType.TerrainRubble, new TileIndex(ctile12.m_ArrayIndex), null, new CVector3(0f, num3, 0f), base.TargetingActor, ctile12.m_HexMap.MapGuid, false, null);
+			ctile12.SpawnProp(cobjectTerrain4, true, base.SpawnDelay);
+			this.m_PropsSpawned++;
+			break;
+		default:
+			return true;
+	++ Subability sections added the code below in the foreach (ctile in base.InlineSubAbilityTiles) parts:
+		CActor cactor = ScenarioManager.Scenario.FindActorAt(ctile.m_ArrayIndex, null, false, false);
+		if (cactor != null)
+		{
+			this.m_ActorsToIgnore.Add(cactor);
+		}
+
+ScenarioRuleLibrary.YML.AbilityData.ParseAbilityProperties()
+numchecker says 4248789949 (10 digits)
+	++ if (num == 4248789949)
+	{
+		if (!(text == "PlaceTerrain"))
+		{
+			goto IL_A02D;
+		}
+		string text47;
+		if (YMLShared.GetStringPropertyValue(mappingEntry.Value, "Ability/PlaceTerrain", filename, out text47))
+		{
+			abilityType = new CAbility.EAbilityType?(CAbility.EAbilityType.PlaceTerrain);
+			propName = text47;
+			continue;
+		}
+		flag = false;
+		continue;
+	}
+
+++ ScenarioRuleLibrary.SEventAbilityPlaceTerrain (new event based off SEventAbilityCreate)
+	-+ replaced the base event and Create ability type to PlaceTerrain versions
+
+-----------------------------------------------------------------------------------------------------------
+----------------------------------------PLACETERRAIN SUB-TARGETING----------------------------------------
+-----------------------------------------------------------------------------------------------------------
+The problem was that having PlaceTerrain as sub to a CAbilityTargeting ability meant that the terrain would not be spawned if the target ended up dying to the trap that had the targeting ability as a traptrigger ability
+
+ScenarioRuleLibrary.CAbilityTargeting.Perform()
+	.ActorIsSelectingTargetingFocus:
+	++ if (this.m_ActorsToTarget.Count <= 0)
+	{
+		if (base.SubAbilities.Count <= 0 || base.SubAbilities[0].AbilityType != CAbility.EAbilityType.PlaceTerrain)
+		{
+			PhaseManager.NextStep(false);
+			return true;
+		}
+		this.m_State = CAbilityTargeting.TargetingState.InlineSubAbilityCheck;
+		this.Perform();
+	}
+	else
+	{
+		this.m_State = CAbilityTargeting.TargetingState.PreProcessingBeforeActorApplies;
+				this.Perform();
+	}
+
+	.InlineSubAbilityCheck:
+	++ if (base.ActorsTargeted.Count == 0 && cability.AbilityType == CAbility.EAbilityType.PlaceTerrain)
+	{
+		PhaseManager.StepComplete(false);
+		foreach (CTile cTile in base.InlineSubAbilityTiles)
+		{
+			CAbility cability3 = CAbility.CopyAbility(cability, true, true, false);
+			cability3.ParentAbility = this;
+			cability3.InlineSubAbilityTiles.Add(cTile);
+			list4.Add(cability3);
+		}
+	}
+
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------PLACETERRAIN NON-OVERLAP-----------------------------------------
+-----------------------------------------------------------------------------------------------------------
+The problem was that having two traps with PlaceTerrain tied to them both sprung by a Push 2 or Pull 2 would cause the terrains to overlap (not game-breaking, but certainly unclear to the player)
+
+Chosen solution: the first trap to be triggered will have its terrain placed, and the second will not.
+
+ScenarioRuleLibrary.PlaceTerrain.Perform()
+	The code below was placed in the AoE and non-AoE sections - thank goodness for the check method
+	++ if (!ctile13.CheckForPropTypes(new List<ScenarioManager.ObjectImportType>
+	{
+		ScenarioManager.ObjectImportType.TerrainHotCoals,
+		ScenarioManager.ObjectImportType.TerrainRubble,
+		ScenarioManager.ObjectImportType.TerrainWater,
+		ScenarioManager.ObjectImportType.TerrainThorns
+	}))
+
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------ANY AND ALL SUB-TARGETING-----------------------------------------
+-----------------------------------------------------------------------------------------------------------
+Find a way to get all targeting abilities to do like placeterrain and get the pushed target instead of the actor that the target gets pushed through so the abilities automatically work correctly
+
+ScenarioRuleLibrary.CAbilityTargeting.Start()
+	-- removed the last part of the inlinesub section to replace it with the code below
+	++ List<CActor> list9 = ScenarioManager.Scenario.FindActorsAt(ctile7.m_ArrayIndex, null, false, false);
+	if (list9 != null && list9.Count > 0)
+	{
+		if (list9.Count > 1 && base.AbilityFilter.IsValidTarget(list9[1], base.TargetingActor, base.IsTargetedAbility, false, new bool?(false), false))
+		{
+			this.m_ValidActorsInRange.Add(list9[1]);
+		}
+		else if (list9[0] != null && base.AbilityFilter.IsValidTarget(list9[0], base.TargetingActor, base.IsTargetedAbility, false, new bool?(false), false))
+		{
+			this.m_ValidActorsInRange.Add(list9[0]);
+		}
+	}
+
+-----------------------------------------------------------------------------------------------------------
+---------------------------------------NEW ACTIVE BEHAVIOR: PROVOKE---------------------------------------
+-----------------------------------------------------------------------------------------------------------
+Lots of Runeriot cards use this, and even the Enticing Bell from Frosthaven.
+
+ScenarioRuleLibrary.CActiveBonus.EActiveBonusBehaviourType
+	++ public const CActiveBonus.EActiveBonusBehaviourType Provoke = 68;
+
+ScenarioRuleLibrary.CActor.CheckForCachedValuesAfterActiveBonusesUpdate()
+	++ List<CActiveBonus> provokeList = (from x in CActiveBonus.FindAllActiveBonuses() where x.BaseCard != null && x.Actor == this && x.Caster != x.Actor && x.BaseCard.CardType == CBaseCard.ECardType.Item select x).Concat(CActiveBonus.FindApplicableActiveBonuses(actor, CAbility.EAbilityType.AddActiveBonus, CActiveBonus.EActiveBonusBehaviourType.Provoke)).Distinct<CActiveBonus>().ToList<CActiveBonus>();
+	++ this.CachedActiveItemEffectBonuses.AddRange(provokeList);
+
+ScenarioRuleLibrary.CActorStatic.FindAllPathsToTarget()
+	++ bool provoked = false;
+	if (CActiveBonus.FindApplicableActiveBonuses(actor, CAbility.EAbilityType.AddActiveBonus, CActiveBonus.EActiveBonusBehaviourType.Provoke).Count > 0)
+	{        
+		provoked = true;
+	}
+
+	-+ if (!provoked && !tryTraps)
+	++ bool flag9 = false;
+	if (provoked)
+	{
+		flag9 = CActorStatic.InternalAIMove(actor, targetActor, targetArrayIndex, targetActors, blockingActors, list2, maxMoveCount, jump, fly, ignoreDifficultTerrain, ignoreHazardousTerrain, isPlayer, range, ref list, false, null, true, false, null, !fly, false, attack, canTargetInvisible, shouldPathThroughDoors, noMovementNeeded, openDoorwaysBlock);
+		if (flag9)
+		{
+			list.Sort((CActorStatic.CTargetPath x, CActorStatic.CTargetPath y) => x.m_HypotheticalMoveNodesLeftToTargetToGetInRange.CompareTo(y.m_HypotheticalMoveNodesLeftToTargetToGetInRange));
+			list.RemoveAll((CActorStatic.CTargetPath x) => x.m_HypotheticalMoveNodesLeftToTargetToGetInRange > list[0].m_HypotheticalMoveNodesLeftToTargetToGetInRange);
+			list.Sort((CActorStatic.CTargetPath x, CActorStatic.CTargetPath y) => x.m_TrapsInPath.Count.CompareTo(y.m_TrapsInPath.Count));
+			list.Reverse();
+			list.RemoveAll((CActorStatic.CTargetPath x) => x.m_TrapsInPath.Count < list[0].m_TrapsInPath.Count);
+			list.Reverse();
+		}
+	}
+	if (flag8 || flag9)
+
+ScenarioRuleLibrary.CActorStatic.InternalAIMove()
+	++ bool provoked = false;
+	List<CActiveBonus> provokeList = CActiveBonus.FindApplicableActiveBonuses(actor, CAbility.EAbilityType.AddActiveBonus, CActiveBonus.EActiveBonusBehaviourType.Provoke);
+	if (provokeList.Count > 0)
+	{
+		provoked = true;
+	}
+
+	-+ if (!provoked && ctargetPath5.m_TrapsInPath.Count < num3)
+	-+ else if (provoked || ctargetPath5.m_TrapsInPath.Count == num3)
+
+ScenarioRuleLibrary.CActorStatic.AIMove()
+	++ bool provoked = false;
+	if (CActiveBonus.FindApplicableActiveBonuses(actor, CAbility.EAbilityType.AddActiveBonus, CActiveBonus.EActiveBonusBehaviourType.Provoke).Count > 0)
+        {
+		provoked = true;
+	}
+
+	++ List<CActorStatic.CTargetPath> provokePaths = new List<CActorStatic.CTargetPath>();
+
+	++ else if (provoked)
+	{
+		List<CActor> provokingActors = new List<CActor>();
+		foreach (CActiveBonus provoke in provokeList)
+		{
+			if (!provokingActors.Contains(provoke.Caster))
+			{
+				provokingActors.Add(provoke.Caster);
+			}
+		}
+		foreach (CActor proActor in provokingActors)
+		{
+			bool flag14 = false;
+			bool flag15 = false;
+			bool flag16 = false;
+			List<CActor> list6 = new List<CActor>();
+			if (!CActorStatic.FindAllPathsToTarget(actor, proActor, proActor.ArrayIndex, list3, list4, ref list2, flag, moveTest, maxMoveCount, jump, fly, ignoreDifficultTerrain, false, isPlayer, range, allowMove, cabilityAttack, flag3, flag4, ref flag15, flag16, flag5, moveTest, flag8))
+			{
+				list6.Add(cactor2);
+			}
+			else
+			{
+				flag14 = true;
+			}
+			if (!flag14)
+			{
+				CActorStatic.FindAllPathsToTarget(actor, proActor, proActor.ArrayIndex, list3, list4, ref list2, flag, true, maxMoveCount, jump, fly, ignoreDifficultTerrain, false, isPlayer, range, allowMove, cabilityAttack, flag3, flag4, ref flag15, flag16, flag5, moveTest, flag8);
+			}
+		}
+		list = new List<CActorStatic.CTargetPath>(list2);
+		flag10 = true;
+		if (CActorStatic.MultipleTargets(actor))
+		{
+			bool flag17 = false;
+			bool flag18 = false;
+			foreach (CActor cactor3 in list3)
+			{
+				cactor3.CrowFlyDistance = CActorStatic.CalculateCrowFlyDistance(actor.ArrayIndex, cactor3.ArrayIndex);
+			}
+			list3.Sort((CActor a1, CActor a2) => a1.CrowFlyDistance.CompareTo(a2.CrowFlyDistance));
+			int num2 = int.MaxValue;
+			cactor = null;
+			foreach (CActor cactor4 in list3)
+			{
+				cactor = cactor4;
+				int count = list3.Count;
+				if (!CActorStatic.FindAllPathsToTarget(actor, cactor4, cactor4.ArrayIndex, list3, list4, ref provokePaths, flag, true, maxMoveCount, jump, fly, ignoreDifficultTerrain, false, isPlayer, range, allowMove, cabilityAttack, false, flag4, ref flag17, flag18, flag5, moveTest, null))
+				{
+					foreach (CActorStatic.CTargetPath ctargetPath in provokePaths)
+					{
+						if (ctargetPath.m_ArrayIndices.Count < num2)
+						{
+							num2 = ctargetPath.m_ArrayIndices.Count;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	++ if (provoked && provokePaths != null)
+	{
+		list8.AddRange(provokePaths);
+		list8.Sort((CActorStatic.CTargetPath x, CActorStatic.CTargetPath y) => GameState.s_ActorAdjustedInitiativeComparer.Compare(x.m_Target, y.m_Target));
+		list8.Sort((CActorStatic.CTargetPath x, CActorStatic.CTargetPath y) => x.m_CrowFlyDistance.CompareTo(y.m_CrowFlyDistance));
+	}
+
+-----------------------------------------------------------------------------------------------------------
+----------------------------------------MAKE ONTURN CONDITIONS LAST----------------------------------------
+-----------------------------------------------------------------------------------------------------------
+BUG FIX: Conditions given by hero abilities DURING enemy turns are taken off at the end of that turn.
+
+ScenarioRuleLibrary.GameState
+	++ public static CActor GetPreviousOverriddenActor()
+	{
+		return GameState.s_OverridenActionActorStack.Peek().PreviousActor;
+	}
+
+ScenarioRuleLibrary.CActor.ApplyCondition(the one with NegativeConditions referenced)
+	++ else if (GameState.OverridingCurrentActor && this == GameState.GetPreviousOverriddenActor() && !isMapCondition && decTrigger == EConditionDecTrigger.Turns)
+	{
+		this.Tokens.AddNegativeToken(CCondition.ENegativeCondition.Immobilize, duration + 1, decTrigger, this, false);
+	}
+	++ repeat of above for Disarm, Muddle, and Stun
+
+-----------------------------------------------------------------------------------------------------------
+----------------------------------------TRAPS DO FINISHEDMOVE ACBO----------------------------------------
+-----------------------------------------------------------------------------------------------------------
+BUG FIX: Enemy moving into immobilizing trap don't trigger OnFinishedMovement bonuses. Btw there are two OnMoved sections in CAbilityMove - the first happens for each hex but the second only happens at the end of the movement (the second also carries over a true final movement bool) so that's what I used to fix this.
+
+ScenarioRuleLibrary.CAbilityMove.Perform() - top section that checks for immobilize and stun
+	++ if (this.HasMoved)
+	{
+		CActor.MovedListener onMovedListeners = this.m_CurrentTarget.m_OnMovedListeners;
+		if (onMovedListeners != null)
+		{
+			CTile ctile = ScenarioManager.Tiles[this.m_CurrentTarget.ArrayIndex.X, this.m_CurrentTarget.ArrayIndex.Y];
+			onMovedListeners(this, this.m_CurrentTarget, this.m_ActorsToCarry.ToList<CActor>(), false, 0, true, ctile.m_Props.Count((CObjectProp p) => p.ObjectType == ScenarioManager.ObjectImportType.TerrainWater || p.ObjectType == ScenarioManager.ObjectImportType.TerrainRubble), ctile.m_Props.Count((CObjectProp p) => p.ObjectType == ScenarioManager.ObjectImportType.TerrainHotCoals || p.ObjectType == ScenarioManager.ObjectImportType.TerrainThorns), 0);
+		}
+	}
+
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------TRAPS RESOLVE DURING MOVE-----------------------------------------
+-----------------------------------------------------------------------------------------------------------
+CURRENT PROBLEM - I thought it was a singular issue that Push 2+ causes the effect to occur at the end of the push, but even making the enemy move through the trap with Provoke will cause the effect to occur at the end of the move. Gotta fix that.
+
+ScenarioRuleLibrary.CAbilityMove
+	++ private bool m_TrapSprung = false;
+	++ public bool TrapSprung
+	{
+		get
+		{
+			return this.m_TrapSprung;
+		}
+		set
+		{
+			this.m_TrapSpring = value;
+		}
+	}
+
+	++ if (m_TrapSprung)
+	{
+		PhaseManager.NextStep(false);
+	}
+
+	++ in Start()
+	this.m_TrapSprung = false;
+
+ScenarioRuleLibrary.CActor
+	++ public int AIMoveCost
+		which uses...
+	++ protected int m_AIMoveCost;
+
+ScenarioRuleLibrary.CActorStatic.AIMove()
+	++ if (!fly && (!jump || actor.AIMoveFocusPath.Count == 1))
+	{
+		CTile ctile = ScenarioManager.Tiles[actor.AIMoveFocusPath[0].X, actor.AIMoveFocusPath[0].Y];
+		for (int j = ctile.m_Props.Count - 1; j >= 0; j--)
+		{
+			if (ctile.m_Props[j].ObjectType == ScenarioManager.ObjectImportType.Trap && !ctile.m_Props[j].Activated)
+			{
+				if (PhaseManager.PhaseType != CPhase.PhaseType.Action || ((CPhaseAction)PhaseManager.Phase).CurrentPhaseAbility.m_Ability.AbilityType != CAbility.EAbilityType.Move)
+				{
+					break;
+				}
+				if (actor.AIMoveFocusPath.Count > 1)
+				{
+					SimpleLog.AddToSimpleLog("Truncating move path as a trap will be activated along the way.", true);
+					actor.AIMoveFocusPath.RemoveRange(1, actor.AIMoveFocusPath.Count - 1);
+				}
+				actor.AIMoveCost += CAbilityMove.CalculateMoveUsed(actor.AIMoveFocusPath[0], !fly, !jump, false, ignoreDifficultTerrain, false);
+				if (maxMoveCount - actor.AIMoveCost > 0)
+				{
+					CAbilityMove cabilityMove = ((CPhaseAction)PhaseManager.Phase).CurrentPhaseAbility.m_Ability as CAbilityMove;
+					cabilityMove.TrapSprung = true;
+					CAbility cability = CAbilityMove.CreateDefaultMove(maxMoveCount - actor.AIMoveCost, true, cabilityMove.Range, cabilityMove.Jump, cabilityMove.Fly, cabilityMove.IgnoreDifficultTerrain, cabilityMove.IgnoreHazardousTerrain, cabilityMove.IgnoreBlockedTileMoveCost, cabilityMove.CarryOtherActorsOnHex);
+					List<CAbility> list15 = new List<CAbility> { cability };
+					actor.ArrayIndex = actor.AIMoveFocusPath[0];
+					(PhaseManager.CurrentPhase as CPhaseAction).StackNextAbilities(list15, cabilityMove.TargetingActor, false, true, false);
+					actor.AIMoveCost = 0;
+					return;
+				}
+				break;
+			}
+		}
+	}
+++	actor.AIMoveCost += CAbilityMove.CalculateMoveUsed(actor.AIMoveFocusPath[0], !fly, !jump, false, ignoreDifficultTerrain, false);
+\\	actor.ArrayIndex = actor.AIMoveFocusPath[0];
+\\	actor.AIMoveFocusPath.Remove(actor.AIMoveFocusPath[0]);
+\\	if (actor.AIMoveFocusPath.Count == 0)
+\\	{
+\\		actor.AIMoveFocusPath = null;
+++		actor.AIMoveCost = 0;
+\\	}
+
+
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------PROVOKE ENDS FROM ATTACK-----------------------------------------
+-----------------------------------------------------------------------------------------------------------
+Still needed to make provoke removed by being attacked.
+
+ScenarioRuleLibrary.CAbilityAttack
+	++ List<CActiveBonus> provokeList = CActiveBonus.FindApplicableActiveBonuses(base.TargetingActor, CAbility.EAbilityType.AddActiveBonus, CActiveBonus.EActiveBonusBehaviourType.Provoke);
+	if (base.TargetingActor.Type != CActor.EType.Player && provokeList.Count > 0)
+	{
+		foreach (CActiveBonus provoke in provokeList)
+		{
+			foreach (CActor target in this.m_ActorsToTarget)
+			{
+				if (provoke.Caster == target)
+				{
+					provoke.Finish();
+					base.TargetingActor.CheckForCachedValuesAfterActiveBonusesUpdate();
+					break;
+				}
+			}
+		}
+	}
+
+-----------------------------------------------------------------------------------------------------------
+---------------------------------------NEW ACTIVE BEHAVIOR: BUFFTRAP---------------------------------------
+-----------------------------------------------------------------------------------------------------------
+Runic Power necessity, and probably just good to have anyway. First iteration wasn't getting made into an active bonus properly, the parser just turned it into a trap-placing ability.
+
+ScenarioRuleLibrary.CActiveBonus.EActiveBonusBehaviourType
+	++ public const CActiveBonus.EActiveBonusBehaviourType BuffTrap = 69;
+
+ScenarioRuleLibrary.CActiveBonus.GetBonus()
+	++ case CAbility.EAbilityType.Trap:
+	return new CTrapActiveBonus(baseCard, ability, actor, caster, activeBonusStartRound, iD, remaining);
+
+++ ScenarioRuleLibrary.CTrapActiveBonus_BuffTrap (new class based off CMoveActiveBonus_BuffMove - medium size)
+	-+ added many reference methods and changed the OnTrap call to be way simpler
+
+++ ScenarioRuleLibrary.CTrapActiveBonus (new class based off CMoveActiveBonus - really small)
+	-+ changed every instance of "Move" to "Trap"
+
+ScenarioRuleLibrary.CActor
+	++ public delegate void TrapListener(CAbilityTrap trapAbility);
+	++ public CActor.TrapListener m_OnTrapListeners;
+
+ScenarioRuleLibrary.CBespokeBehaviour
+	++ OnTrap(CAbilityTrap trapAbility){}
+
+ScenarioRuleLibrary.CBespokeBehaviour.AddListeners and .RemoveListeners and .RefreshListeners
+	++ cactor.m_OnTrapListeners = (CActor.TrapListener)Delegate.Combine(cactor.m_OnTrapListeners, new CActor.TrapListener(this.OnTrap));
+
+ScenarioRuleLibrary.CAbilityTrap.Start()
+	++ this.GetBonuses();
+	++ if (base.ActiveBonusData != null && base.ActiveBonusData.Duration != CActiveBonus.EActiveBonusDurationType.NA)
+	{
+		this.m_State = CAbilityTrap.TrapState.PrePlacementBuffTargeting;
+		this.m_ActorsToTarget.Clear();
+		this.m_ActorsToTarget.Add(base.TargetingActor);
+		this.m_ValidActorsInRange = new List<CActor>();
+		this.m_ValidActorsInRange.Add(base.TargetingActor);
+	}
+
+ScenarioRuleLibrary.CAbilityTrap.Perform()
+	++ case CAbilityTrap.TrapState.PrePlacementBuffTargeting:
+		if (base.TargetingActor.Type != CActor.EType.Player || (base.MiscAbilityData.AutotriggerAbility != null && base.MiscAbilityData.AutotriggerAbility.Value))
+		{
+			PhaseManager.StepComplete(false);
+		}
+		else
+		{
+			CActorIsSelectingTargetingFocus_MessageData cactorIsSelectingTargetingFocus_MessageData = new CActorIsSelectingTargetingFocus_MessageData(base.TargetingActor);
+			cactorIsSelectingTargetingFocus_MessageData.m_TargetingAbility = this;
+			cactorIsSelectingTargetingFocus_MessageData.m_IsPositive = true;
+			ScenarioRuleClient.MessageHandler(cactorIsSelectingTargetingFocus_MessageData, false);
+		}
+		break;
+	case CAbilityTrap.TrapState.ApplyTrapBuff:
+	{
+		ScenarioRuleClient.FirstAbilityStarted();
+		base.AbilityHasHappened = true;
+		foreach (CActor cactor in this.m_ActorsToTarget)
+		{
+			this.ApplyToActor(cactor);
+		}
+		CMoveBuff_MessageData cmoveBuff_MessageData = new CMoveBuff_MessageData(base.AnimOverload, base.TargetingActor)
+		{
+			m_MoveAbility = (CAbilityMove)CAbilityMove.CreateDefaultMove(0, false, 0, false, false, false, false, false, false)
+		};
+		ScenarioRuleClient.MessageHandler(cmoveBuff_MessageData, false);
+		PhaseManager.NextStep(false);
+		return true;
+	}
+
+	++ if (base.TargetingActor.m_OnTrapListeners != null)
+	{
+		CActor.TrapListener onTrapListeners = base.TargetingActor.m_OnTrapListeners;
+		if (onTrapListeners != null)
+		{
+			onTrapListeners(this);
+		}
+	}
+
+ScenarioRuleLibrary.CAbilityTrap.TrapState
+	++ PrePlacementBuffTargeting
+	++ ApplyTrapBuff
+
+++ ScenarioRuleLibrary.CAbilityTrap.GetBonuses()
+	++ contains tons of checks that change the ability's trapdata
+
+++ ScenarioRuleLibrary.CAbilityTrap.ApplyToActor()
+public override bool ApplyToActor(CActor actor)
+{
+	if (base.ApplyToActor(actor))
+	{
+		CBaseCard cbaseCard = base.TargetingActor.FindCardWithAbility(this);
+		if (base.ActiveBonusData.OverrideAsSong)
+		{
+			actor.AddAugmentOrSong(this, base.TargetingActor, null, null);
+		}
+		else if (cbaseCard != null)
+		{
+			cbaseCard.AddActiveBonus(this, actor, base.TargetingActor, null, null, false, false, false, false, null, null, true);
+		}
+		else
+		{
+			DLLDebug.LogError("Unable to find base ability card for ability " + base.Name, true);
+		}
+		if (this.m_PositiveConditions.Count > 0)
+		{
+			base.ProcessPositiveStatusEffects(actor);
+		}
+	}
+	return true;
+}
+
+ScenarioRuleLibrary.CAbilityTrap.EnoughTargetsSelected()
+	++ if (base.ActiveBonusData != null && base.ActiveBonusData.Duration != CActiveBonus.EActiveBonusDurationType.NA)
+	{
+		return this.m_ActorsToTarget.Count > 0;
+	}
+
+ScenarioRuleLibrary.CAbilityTrap.LogEvent()   ---   just so the game log doesn't say the ability failed
+	+ if (trapState == CAbilityTrap.TrapState.ApplyTrapBuff)
+	{
+		return;
+	}
+
+-----------------------------------------------------------------------------------------------------------
+-------------------------------STATISBASEDONX: HEXESINAREAWITHNEGATIVEPROPS-------------------------------
+-----------------------------------------------------------------------------------------------------------
+Runic Power top. Was originally going to delete the props too but that should be a higher level ability.
+
+ScenarioRuleLibrary.CAbility
+	++ protected bool m_SetStatIsBasedOnXAfterTargeting;
+
+ScenarioRuleLibrary.CAbility.EStatIsBasedOnXType
+	++ HexesInAreaWithNegativeProps
+
+ScenarioRuleLibrary.CAbility.GetStatIsBasedOnXValue()
+	++ case CAbility.EStatIsBasedOnXType.HexesInAreaWithNegativeProps:
+		if (this.AreaEffect != null)
+		{
+			using (List<CTile>.Enumerator enumerator12 = this.m_ValidTilesInAreaEffectIncludingBlocked.GetEnumerator())
+			{
+				this.m_SetStatIsBasedOnXAfterTargeting = true;
+				while (enumerator12.MoveNext())
+				{
+					if (enumerator12.Current.CheckForPropTypes(new List<ScenarioManager.ObjectImportType>
+					{
+						ScenarioManager.ObjectImportType.TerrainHotCoals,
+						ScenarioManager.ObjectImportType.TerrainRubble,
+						ScenarioManager.ObjectImportType.TerrainWater,
+						ScenarioManager.ObjectImportType.TerrainThorns,
+						ScenarioManager.ObjectImportType.Trap,
+						ScenarioManager.ObjectImportType.Obstacle
+					}))
+					{
+						num2 += 1f;
+					}
+				}
+			}
+		}
+		break;
+	}
+
+ScenarioRuleLibrary.CAbilityAttack.TileSelected()
+	++ if (this.m_SetStatIsBasedOnXAfterTargeting)
+	{
+		base.SetStatBasedOnX(base.TargetingActor, base.StatIsBasedOnXEntries, base.AbilityFilter);
+		this.m_AttackSummary.OverrideModifiedStrength(this.m_Strength);
+		foreach (CActor areaActor in validActorsInArea)
+		{
+			this.m_AttackSummary.RefreshingTargetDataForMultipassAttack(this, areaActor);
+		}
+		CUpdateAttackFocusAfterAttackEffectInlineSubAbility cupdateAttackFocusAfterAttackEffectInlineSubAbility = new CUpdateAttackFocusAfterAttackEffectInlineSubAbility(base.TargetingActor);
+		cupdateAttackFocusAfterAttackEffectInlineSubAbility.m_AttackingActor = base.TargetingActor;
+		cupdateAttackFocusAfterAttackEffectInlineSubAbility.m_AttackAbility = this;
+		CUpdateAttackFocusAfterAttackEffectInlineSubAbility cupdateAttackFocusAfterAttackEffectInlineSubAbility2 = cupdateAttackFocusAfterAttackEffectInlineSubAbility;
+		CAttackSummary attackSummary = this.m_AttackSummary;
+		cupdateAttackFocusAfterAttackEffectInlineSubAbility2.m_AttackSummary = ((attackSummary != null) ? attackSummary.Copy() : null);
+		ScenarioRuleClient.MessageHandler(cupdateAttackFocusAfterAttackEffectInlineSubAbility, false);
+	}
+
+ScenarioRuleLibrary.CAbilityAttack.CopyAbility()
+	++ if (ability.m_SetStatIsBasedOnXAfterTargeting)
+	{
+		list16.Clear();     --- this keeps active bonuses and items from messing up strength
+	}
+
+ScenarioRuleLibrary.CAbility.Start()
+	++ this.m_SetStatIsBasedOnXAfterTargeting = false;
+
+-----------------------------------------------------------------------------------------------------------
+--------------------------------NEW CONDITIONAL FILTER: TARGETPROVOKECOUNT--------------------------------
+-----------------------------------------------------------------------------------------------------------
+For top of Rowdy Charge.
+
+ScenarioRuleLibrary.CAbilityFilter
+	++ added numchecker necessities in the ctor method
+	++ public CEqualityFilter FilterTargetProvokeCount { get; set; }
+	.GetObjectData()
+		++ info.AddValue("FilterTargetProvokeCount", this.FilterTargetProvokeCount);
+
+ScenarioRuleLibrary.YML.CardProcessingShared.GetAbilityFilter()
+	++ added numchecker necessities --- 697573875
+	++ if (text == "TargetProvokeCount")
+	{
+		string textProvoke;
+		if (!YMLShared.GetStringPropertyValue(mappingEntry.Value, "Filter/TargetProvokeCount", filename, out textProvoke))
+		{
+			flag = false;
+			continue;
+		}
+		CEqualityFilter cequalityFilterProvoke;
+		if (CardProcessingShared.GetEqualityFilter(textProvoke, "TargetProvokeCount", filename, out cequalityFilterProvoke))
+		{
+			filter.FilterTargetProvokeCount = cequalityFilterProvoke;
+			continue;
+		}
+		flag = false;
+		continue;
+	}
+
+
+Add new constructor with the following parameter and equalizer:
+	++ CEqualityFilter filterTargetProvokeCount = null
+	++ this.FilterTargetProvokeCount = filterTargetProvokeCount;\
+
+ScenarioRuleLibrary.CAbilityFilter.Copy()
+	++ CEqualityFilter filterTargetProvokeCount = this.FilterTargetProvokeCount;
+	CEqualityFilter cequalityFilter21 = ((filterTargetProvokeCount != null) ? filterTargetProvokeCount.Copy() : null);
+	++ changed constructor at the end to also include cequalityfilter21
+
+ScenarioRuleLibrary.CAbilityFilter.CheckConditionsFilters() and .CheckConditionsFilters_ActorState()
+	++ bool flag9 = this.FilterTargetProvokeCount == null;
+	++ if (this.FilterTargetProvokeCount != null)
+	{
+		flag9 = this.FilterTargetProvokeCount.Compare(CActiveBonus.FindApplicableActiveBonuses(target, CAbility.EAbilityType.AddActiveBonus, CActiveBonus.EActiveBonusBehaviourType.Provoke).Count, -1, 0);
+		if (this.Invert)
+		{
+			flag9 = !flag9;
+		}
+	}
+	-+ return flag && flag2 && flag3 && flag4 && flag5 && flag6 && flag7 && flag8 && flag9;
+
+-----------------------------------------------------------------------------------------------------------
+---------------------------------UPDATE MOVETRAP WITH TRIGGEREDTRAPABILITY---------------------------------
+-----------------------------------------------------------------------------------------------------------
+MoveTrap is an ability that exists in the code, but doesn't actually seem to get used anywhere. Makes my job easier, though! The only issue is that I need to have it copy over TriggeredTrapAbility stuff. Later I also fixed bugs involving damage and AdjCon, so that's included below.
+
+ScenarioRuleLibrary.CAbilityMoveTrap.Perform()
+	++ trapData.TrapCardID = cobjectTrap2.TrapCardID;
+	++ trapData.TriggeredTrapAbility = cobjectTrap2.TriggeredTrapAbility;
+	-+ trapData.Damage = ((cobjectTrap2.Owner != null || cobjectTrap2.HasCustomDamageSet) ? cobjectTrap2.DamageValue : ScenarioManager.Scenario.SLTE.TrapDamage);
+	-+ if (cobjectTrap2.AdjacentRange > 0)
+	{
+		trapData.AdjacentConditions = cobjectTrap2.AdjacentConditions.ToList<CCondition.ENegativeCondition>();
+	}
+	-+ if (cobjectTrap2.Conditions.Count > 0)
+	{
+		trapData.Conditions = cobjectTrap2.Conditions.ToList<CCondition.ENegativeCondition>();
+	}
+
+ScenarioRuleLibrary.CObjectTrap dictionary reference needed my update - this change shows up in dnspy but not in dotpeek?
+	++ this.TriggeredTrapAbility = state.TriggeredTrapAbility;
+	++ this.TrapCardID = state.TrapCardID;
+
+-----------------------------------------------------------------------------------------------------------
+----------------------------------BUGFIX: BUFFTRAP PERMANENTLY BUFFS TRAP----------------------------------
+-----------------------------------------------------------------------------------------------------------
+Annoying bug, apparently having another trapdata variable doesn't get around the problem.
+
+ScenarioRuleLibrary.CAbilityTrap
+	++ private List<CCondition.ENegativeCondition> m_OriginalConditions;
+	++ private List<CCondition.ENegativeCondition> m_OriginalAdjacentConditions;
+	++ private CAbilityFilterContainer m_OriginalAdjacentFilter;
+
+ScenarioRuleLibrary.CAbilityTrap.Start()
+	++ this.m_OriginalConditions = this.TrapData.Conditions;
+	++ this.m_OriginalAdjacentConditions = this.TrapData.AdjacentConditions;
+	++ this.m_OriginalAdjacentFilter = this.TrapData.AdjacentFilter;
+
+++ ScenarioRuleLibrary.CAbilityTrap.RemoveBonuses()
+	++ if (actor == null)
+	{
+		actor = base.TargetingActor;
+	}
+	List<CActiveBonus> list = CActiveBonus.FindApplicableActiveBonuses(actor, CAbility.EAbilityType.Trap, CActiveBonus.EActiveBonusBehaviourType.None);
+	if (list != null)
+	{
+		foreach (CActiveBonus cactiveBonus2 in list)
+		{
+			this.TrapData.Damage /= cactiveBonus2.ReferenceStrengthScalar(this, actor);
+		}
+		foreach (CActiveBonus cactiveBonus3 in list)
+		{
+			this.TrapData.Damage -= cactiveBonus3.ReferenceStrength(this, actor);
+			CTrapActiveBonus ctrapActiveBonus = cactiveBonus3 as CTrapActiveBonus;
+			if (ctrapActiveBonus != null && ctrapActiveBonus.BespokeBehaviour != null)
+			{
+				int? num = ((CTrapActiveBonus_BuffTrap)ctrapActiveBonus.BespokeBehaviour).ReferenceTriggeredXP(this, actor);
+				int num2 = 0;
+				if (!((num.GetValueOrDefault() == num2) & (num != null)))
+				{
+					this.TrapData.TriggeredXP -= ((CTrapActiveBonus_BuffTrap)ctrapActiveBonus.BespokeBehaviour).ReferenceTriggeredXP(this, actor).Value;
+				}
+				num = ((CTrapActiveBonus_BuffTrap)ctrapActiveBonus.BespokeBehaviour).ReferenceAdjacentRange(this, actor);
+				num2 = 0;
+				if (!((num.GetValueOrDefault() == num2) & (num != null)))
+				{
+					this.TrapData.AdjacentRange -= ((CTrapActiveBonus_BuffTrap)ctrapActiveBonus.BespokeBehaviour).ReferenceAdjacentRange(this, actor).Value;
+				}
+				num = ((CTrapActiveBonus_BuffTrap)ctrapActiveBonus.BespokeBehaviour).ReferenceAdjacentDamage(this, actor);
+				num2 = 0;
+				if (!((num.GetValueOrDefault() == num2) & (num != null)))
+				{
+					this.TrapData.AdjacentDamage -= ((CTrapActiveBonus_BuffTrap)ctrapActiveBonus.BespokeBehaviour).ReferenceAdjacentDamage(this, actor).Value;
+				}
+			}
+		}
+	}
+	this.TrapData.Conditions = this.m_OriginalConditions;
+	this.TrapData.AdjacentFilter = this.m_OriginalAdjacentFilter;
+	this.TrapData.AdjacentConditions = this.m_OriginalAdjacentConditions;
+	if (base.TargetingActor.m_OnTrapListeners != null)
+	{
+		CActor.TrapListener onTrapListeners = base.TargetingActor.m_OnTrapListeners;
+		if (onTrapListeners != null)
+		{
+			onTrapListeners(this);
+		}
+	}
+
+ScenarioRuleLibrary.CAbilityTrap.Perform()
+	++ this.RemoveBonuses(null);
+	++ cobjectTrap = new CObjectTrap(this.TrapData.TrapName, ScenarioManager.ObjectImportType.Trap, new TileIndex(this.m_TilesSelected[0].m_ArrayIndex), null, null, base.TargetingActor, this.m_TilesSelected[0].m_HexMap.MapGuid, this.TrapData);
+
+-----------------------------------------------------------------------------------------------------------
+--------------------------------OVERSIGHT: PLAYER-CONTROLLED MOVE INTO ACBO--------------------------------
+-----------------------------------------------------------------------------------------------------------
+Players controlling monster movement doesn't trigger Overwatch or Rune effects, when it really should. The code changes below fix things for single action control, but not turn control. I'm probably not gonna do that. I targeted the fix at 3 specific DuringActionAbilityActiveBonus things, just to be safe and not mess with others.
+
+ScenarioRuleLibrary.CActor
+	++ protected bool m_SkipListenerRemoval = false;
+	++ public bool SkipListenerRemoval
+	{
+		get
+		{
+			return this.m_SkipListenerRemoval;
+		}
+		set
+		{
+			this.m_SkipListenerRemoval = value;
+		}
+	}
+
+ScenarioRuleLibrary.CAbilityControlActor.ApplyToActor() --- only the section for OneAction, not OneTurn
+	++ if (actor.m_OnMovedListeners != null || actor.m_OnTrapTriggeredListeners != null)
+	{
+		actor.SkipListenerRemoval = true;
+	}
+
+ScenarioRuleLibrary.CBespokeBehaviour.RemoveListeners()
+	++ if (!actor.SkipListenerRemoval)
+	{
+		...
+	}
+	else {actor.SkipListenerRemoval = false;}
+
+	++ if (!cactor.SkipListenerRemoval)
+	{
+		...
+	}
+	else {actor.SkipListenerRemoval = false;}
+
+	++ List<CActor> skippedActors = new List<CActor>();
+
+	++ if (skippedActors.Count > 0)
+	{
+		this.m_AdditionalActors.AddRange(skippedActors);
+	}
+
+ScenarioRuleLibrary.CDuringActionAbilityActiveBonus_TriggerAbilityOnSpecificTrapTrigger.OnTrapTriggered()
+ScenarioRuleLibrary.CDuringActionAbilityActiveBonus_TriggerAbilityOnTrapTrigger.OnTrapTriggered()
+ScenarioRuleLibrary.CDuringActionAbilityActiveBonus_TriggerAbilityOnFinishedMovement.OnMoved()
+	++ if (GameState.CurrentOverridenActorForTurnData == null && (movedActor.OriginalType == CActor.EType.Enemy || movedActor.OriginalType == CActor.EType.Enemy2 || movedActor.OriginalType == CActor.EType.Neutral))
+	{
+		movedActor.Type = movedActor.OriginalType;
+	}
+
+-----------------------------------------------------------------------------------------------------------
+--------------------------------------BUGFIX: MODDED SAVES CAN'T LOAD--------------------------------------
+-----------------------------------------------------------------------------------------------------------
+Opening Gloomhaven adds an underscore before modded ruleset names, rendering them useless. For example:
+Campaign_[MOD]RuleSetName[MOD]_PartyName_55555555 becomes Campaign_[MOD]_RuleSetName[MOD]_PartyName_55555555
+
+GH.Runtime.PartyAdventureData
+	-+ public string PartySaveDir
+	{
+		get
+		{
+			string text = Path.Combine(this.PartySaveRoot, this.PartySaveName);
+			if (text.Contains("_[MOD]_"))
+			{
+				text = text.Replace("_[MOD]_", "_[MOD]");
+			}
+			return text;
+		}
+	}
+
+-----------------------------------------------------------------------------------------------------------
+------------------------------------------SUMMONS CAN USE PROVOKE------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+UNIMPLEMENTED IDEA - NOT IN GHEM
+
+ScenarioRuleLibrary.CAbilityAddActiveBonus.ApplyToActor()
+	++ if (cbaseCard == null && base.TargetingActor.OriginalType == CActor.EType.HeroSummon)
+	{
+		if (this.ActiveBonusData.Duration == CActiveBonus.EActiveBonusDurationType.Persistent)
+		{
+			DLLDebug.LogError("Error: HeroSummon SubAttack Active Bonus cannot be Persistent " + base.Name, true);
+		}
+		else
+		{
+			CHeroSummonActor summon = base.TargetingActor as CHeroSummonActor;
+			cbaseCard = summon.BaseCard;
+		}
+	}
+
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+Controlled move into acbo only works for the first controlled move that doesn't put an enemy in a trap.
+Also still can't use the favorite on Overwatch bottom.
+
+POSSIBLE BUG: I don't know how to repro... a guard attacked from an occupied tile then walked out of the map
+	with all the changes, see if this still happens
+SHOULD LOOK INTO: low bandwidth download for modded rulesets - it's gotta be in the code, right?
+
+Push and pull do get truncated if the trap will kill, but ONLY if it will kill, not if trap abilities happen
+
+Impossible Layout references can keep the game from loading after choosing a ruleset
+
+using SharedLibrary.Logger;
+DLLDebug.Log("This would be your debug message to later be viewed in Player.log");
