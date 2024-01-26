@@ -1324,6 +1324,8 @@ ScenarioRuleLibrary.CDuringActionAbilityActiveBonus_TriggerAbilityOnFinishedMove
 -----------------------------------------------------------------------------------------------------------
 Opening Gloomhaven adds an underscore before modded ruleset names, rendering them useless. For example:
 Campaign_[MOD]RuleSetName[MOD]_PartyName_55555555 becomes Campaign_[MOD]_RuleSetName[MOD]_PartyName_55555555
+then Campaign_[MOD]_PartyName[MOD]_RuleSetName[MOD]__55555555
+then Campaign_[MOD]_RuleSetName[MOD]_PartyName[MOD]__55555555 alternating with above
 
 GH.Runtime.PartyAdventureData
 	-+ public string PartySaveDir
