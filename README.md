@@ -108,7 +108,7 @@ internal sealed class PrivateImplementationDetails
         {
             num = 0x811c9dc5;
             for (int i = 0; i < s.Length; i++)
-            }
+            {
                 num = (s[i] ^ num) * 0x1000193;
             }
         }
