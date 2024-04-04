@@ -49,6 +49,10 @@ ScenarioRuleLibrary.YML.AbilityData.ParseTrapData
 		continue;
 	}
 
+ScenarioRuleLibrary.CActor
+	++ public delegate void TrapTriggeredListener(CObjectTrap trap, CActor actor);
+	++ public CActor.TrapTriggeredListener m_OnTrapTriggeredListeners;
+
 ScenarioRuleLibrary.CObjectTrap
 	++ public bool TriggeredTrapAbility { get; private set; }
 	++ public int TrapCardID { get; private set; }
@@ -82,6 +86,11 @@ ScenarioRuleLibrary.CActiveBonus.CreateActiveBonus
 	++ case CActiveBonus.EActiveBonusBehaviourType.DuringActionAbilityOnTrapTrigger:
 	++ case CActiveBonus.EActiveBonusBehaviourType.DuringActionAbilityOnSpecificTrapTrigger:
 
+ScenarioRuleLibrary.CBespokeBehaviour
+	++ OnTrapTriggered(CObjectTrap trap, CActor actor){}
+ScenarioRuleLibrary.CBespokeBehaviour.AddListeners and .RemoveListeners and .RefreshListeners (slight adjustments for each)
+	++ cactor.m_OnTrapTriggeredListeners = (CActor.TrapTriggeredListener)Delegate.Combine(cactor.m_OnTrapTriggeredListeners, new CActor.TrapTriggeredListener(this.OnTrapTriggered));
+
 ++ CDuringActionAbilityActiveBonus_TriggerAbilityOnTrapTrigger (this is a new class based off FinishedMovement)
 	++ OnCarried method from MovedORCarried
 	-+ Replaced RequirementsMet with the one from MoveORCarried
@@ -94,7 +103,7 @@ ScenarioRuleLibrary.CActiveBonus.CreateActiveBonus
 		}
 
 ++ CDuringActionAbilityActiveBonus_TriggerAbilityOnSpecificTrapTrigger (this is a new class based off above)
-	++ public override void OnTrapTriggered(CObjectTrap trap, CActor movedActor)
+	-+ public override void OnTrapTriggered(CObjectTrap trap, CActor movedActor)
 	{
 		if (this.m_ActiveBonusData.ActiveBonusCardID == trap.TrapCardID)
 		{
@@ -114,20 +123,10 @@ ScenarioRuleLibrary.CDuringActionAbilityActiveBonus
 		this.m_BespokeBehaviour = new CDuringActionAbilityActiveBonus_TriggerAbilityOnSpecificTrapTrigger(actor, ability, this);
 		return;
 
-ScenarioRuleLibrary.CActor
-	++ public delegate void TrapTriggeredListener(CObjectTrap trap, CActor actor);
-	++ public CActor.TrapTriggeredListener m_OnTrapTriggeredListeners;
-
-ScenarioRuleLibrary.CBespokeBehaviour
-	++ OnTrapTriggered(CObjectTrap trap, CActor actor){}
-
-ScenarioRuleLibrary.CBespokeBehaviour.AddListeners and .RemoveListeners and .RefreshListeners
-	++ cactor.m_OnTrapTriggeredListeners = (CActor.TrapTriggeredListener)Delegate.Combine(cactor.m_OnTrapTriggeredListeners, new CActor.TrapTriggeredListener(this.OnTrapTriggered));
-
-ScenarioRuleLibrary.YML.ActiveBonusData
+ScenarioRuleLibrary.YML.AbilityData.ActiveBonusData
 	++ public int ActiveBonusCardID;
 
-ScenarioRuleLibrary.YML.ActiveBonusData.Copy()
+ScenarioRuleLibrary.YML.AbilityData.ActiveBonusData.Copy()
 	++ activeBonusData.ActiveBonusCardID = this.ActiveBonusCardID;
 
 ScenarioRuleLibrary.YML.AbilityData.ParseActiveBonusDuration()
