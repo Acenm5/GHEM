@@ -2,9 +2,7 @@
 Gloomhaven Expanded Modding
 
 # Next Steps
-GHEM has been updated to work with the latest official release as of December 2023, and it fixes the bug that renders modded saves unusable! GHEM updates for the 1.1.8307.0 update will continue in a bit, after devs have the chance to perform any necessary hotfixes.
-
-The next big undertaking will be developing an injector, most likely using BepInEx, to replace the current implementation of GHEM (which requires manual readdition after the files are replaced with an official update). This will likely take a while.
+GHEM has been updated to work with the latest official release as of December 2023, and it fixes the bug that renders modded saves unusable! As of now, there are no plans to update the mod.
 
 ## ABOUT
 GHEM is a forever-free assembly edit of the digital edition of Gloomhaven. Its goals, in order of priority, are to:
